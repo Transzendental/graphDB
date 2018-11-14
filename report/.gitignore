@@ -1,0 +1,20 @@
+# use glob syntax.
+syntax: glob
+
+# eclipse conf file
+.project
+.texlipse
+tmp/
+
+*.aux
+*.bbl
+*.blg
+*.lof
+*.log
+*.lol
+*.lot
+*.nlo
+*.nls
+*.pdf
+*.toc
+!images/Logo_dt.pdf
