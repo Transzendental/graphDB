@@ -6,12 +6,15 @@ Die Ausarbeitung lässt sich in zwei grundsätzliche Teile gliedern. Der erste T
 
 Folgende Szenarien werden vorgestellt:
 \begin{itemize}
-	\item Graph-Datenbanken in Bezug auf die Speicherung und Verarbeitung natürlicher Sprache. Dabei wird auf unterschiedliche graph-basierte Verfahren des Natural-Language-Processing eingegangen. Auch die Ermittlung statistischer Auffälligkeiten über mehrere zu analysierende Texte hinweg ist ein beispielhaftes Szenario für die Nutzung von Graphen im Text Mining. Bei dauerhaften Speicherung von Texten können Graph-Datenbanken auch eine Rolle spielen.
+	\item Text-Mining, Natural Language Processing
 	\item Soziale Netze
 	\item Betrugserkennung
+	\item Empfehlungs-Engine
+	\item Verkehrsnetze
+	\item Stammdatenmanagement
 \end{itemize}
 
-Der zweite Teil dieser Ausarbeitung wird eine praktische Umsetzung mittels MariaDB OQGRAPH \cite{oqgraph} sein. QOGRAPH ist ein Aufsatz auf der relationalen Datenbank MariaDB und erlaubt die Modellierung hierarchischer Strukturen (sprich Graphen)  mittels SQL. Zuvor wird noch das System, insbesondere seine Eigenheit, vorgestellt und die Installation auf dem Hochschulrechner dokumentiert.
+Der zweite Teil dieser Ausarbeitung wird eine praktische Umsetzung mittels MariaDB OQGRAPH \cite{oqgraph} sein. Zuvor wird noch das System, insbesondere seine Eigenheit, vorgestellt und die Installation auf dem Hochschulrechner dokumentiert.
 
 Dieser Teil besteht aus zwei Anwendungen, die jeweils andere Anforderungen an eine Graphdatenbank stellen. Die erste Anwendung ist eine OLTP System in der Form eines Gästebuchs. Im Fokus steht dabei vor allem die Aspekte der Modellierung, dafür wird das eigentliche Modell in QOGRAP erstellt. Im Zuge dessen werden die Unterschiede, insbesondere die Vorteile, im Vergleich zu einem relationalem Ansatz erarbeitet. Des weiteren werden diverse Use Cases implementiert, die über ein eigens dafür entworfenes, simples Frontend gesteuert werden können.
 
