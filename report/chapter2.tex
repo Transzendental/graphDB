@@ -1,4 +1,14 @@
 \chapter{MariaDB mit OQGRAPH}
 \section{Installation}
+In diesem Kapitel wird die Installation und Konfiguration des DBS MaraiDB, sowie des Plugins QOGRAPH auf einem Ubuntu Rechner beschrieben.  
+QOGRAPH wird als Plugin in einem eigenständigem Softwarepaket verteilt. Es ist nicht zwingend nötig den MariaDB-Server explizit zu installieren, dieser ist als Abhängigkeit definiert und wird automatisch mit installiert, wenn keine gültige Installation gefunden wird. Alle benötigten Pakete können mittels apt-get installiert werden.
+\begin{lstlisting}
+sudo apt-get install mariadb-plugin-oqgraph
+\end{lstlisting}
+Danach muss das Plugin noch installiert werden. Dafür in die DBMS-Konsole \texttt{mysql} wechseln und folgendes Kommando eingeben. %TODO Rechte mysql konsole
+\begin{lstlisting}
+INSTALL SONAME 'ha_oqgraph';
+\end{lstlisting}
+
 \section{Grundlegende Funktionsweise}
 \section{Aufbau}
