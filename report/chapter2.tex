@@ -5,10 +5,12 @@ QOGRAPH wird als Plugin in einem eigenständigem Softwarepaket verteilt. Es ist 
 \begin{lstlisting}
 sudo apt-get install mariadb-plugin-oqgraph
 \end{lstlisting}
-Danach muss das Plugin noch installiert werden. Dafür in die DBMS-Konsole \texttt{mysql} wechseln und folgendes Kommando eingeben. %TODO Rechte mysql konsole
+Danach muss das Plugin noch installiert werden. Dafür in die DBMS-Konsole \texttt{mysql} wechseln und folgendes Kommando eingeben. Die Installation ist damit abgeschlossen.
 \begin{lstlisting}
 INSTALL SONAME 'ha_oqgraph';
 \end{lstlisting}
+
+Dabei ist zu beachten, dass MaraiDB das User-Directory von Unix nutzt. Dementsprechend kann nur mit root Rechten in die \texttt{mysql} Konsole  gewechselt werden. Es ist also nötig \texttt{sudo} zu verwenden. Damit auch normale User die Datenbank administrieren können, muss das \texttt{unix\_socket} Plugin deaktiviert werden.
 
 \section{Grundlegende Funktionsweise}
 \section{Aufbau}
