@@ -1,5 +1,15 @@
 \chapter{Anwendungsszenarien}
 \section{Text-Mining, Natural Language Processing}
+Im Fachgebiet des Text Minings, oder auch des Natural Language Processing (NLP), geht es um die Extraktion, Interpretation und statistische Auswertung von natürlich-menschlicher Sprache. Entsprechende Verfahren des NLP ermöglichen es, Informationen aus Texten zu extrahieren. Auch das Erkennen von Wortarten von Wörtern innerhalb eines Satzes spielt dabei eine Rolle.
+
+Seit der Entwicklung von Smartphones gewann das NLP an Bedeutung. So wurden Verfahren der „Tippkorrektur“ implementiert und auf zahlreichen Smartphones implementiert. Inzwischen wurde die Tippkorrektur auch um eine Funktion der „Autovervollständigung“ erweitert, bei der Wörter nach der Eingabe von wenigen Buchstaben zur Vervollständigung vorgeschlagen werden. Anhand der Beobachtung welche Wörter besonders häufig miteinander vorkommen, schlagen Verfahren zur Autovervollständigung oft sogar ganze Wörter oder gar Reihen von Worten vor, ohne das damit begonnen wurde sie einzutippen. Auch bei der Übersetzung von Sätzen in eine andere Sprache kommen Verfahren des NLP zum Einsatz.
+
+Zur Vorhersage von Wörtern oder Buchstaben werden mitunter Hidden-Markov-Modelle zur Hilfe gezogen \cite[p.~207]{jurafsky01}. Bei Hidden-Markov-Modellen handelt es sich um ein sehr wichtiges Verfahren des Machine-Learnings. Bei Markov-Ketten handelt es sich um gewichtete, endliche Automaten. Die Markov-Kette besteht auch Knoten, die mittels gewichteter Kanten miteinander verbunden sind. Die Knoten stellen hierbei einen Zustand, wie beispielsweise ein Wort, dar. Die gewichteten Kanten beschreiben die Wahrscheinlichkeit, dass der jeweils nächste Zustand eintritt. \cite[p.~208 ff.]{jurafsky01}\cite[p.~318 ff.]{manning01}. Bei einem Hidden-Markov-Modell wird zwischen beobachtbaren Zuständen und versteckten Zuständen unterschieden. Es handelt sich hierbei um eine Erweiterung von Markov-Ketten. \cite[p.~211 ff.]{jurafsky01}.
+
+Markov-Modelle werden durch Verfahren des Machine-Learnings gebildet. Dabei werden Trainingsdaten benötigt, aus denen die Wahrscheinlichkeit für bestimmte Zustände ermittelt werden. Für das Anlernen der Wahrscheinlichkeiten und der Zustände gibt es unterschiedliche Verfahren. \cite[p.~213 ff.]{jurafsky01}\cite[p.~326 ff.]{manning01} Grundsätzlich lässt sich festhalten, dass die Aussagekraft eines Markov-Modells in Abhängigkeit zur Trainingsmenge steht. Eine hohe Aussagekraft des Modells wird mit einer großen Trainingsmenge erreicht. Jedoch steigt mit einer größeren Trainingsmenge auch der Aufwand des jeweiligen Lernverfahrens.
+
+Bei Markov-Ketten handelt es sich um gewichtete Graphen, deren Umsetzung sich in einer Graph-Datenbank anbietet. Auf diese Weise kann auf einer für Graphen natürlichen Art und Weise ein Ergebnis für die Markov-Kette berechnet werden. Graph-Datenbanken, die die jeweiligen Markov-Modelle beinhalten, können dann auf anderen Geräten, wie Computer, Server oder Smartphones, gespeichert und dort genutzt werden. So werden unter Anderem Systeme zur Tippfehlerkorrektur unterstützt. Durch die Übertragung von Markov-Modellen in Graph-Datenbanken ist es also möglich, bereits trainierte Modelle auf andere Computer zu übertragen und dort nutzbar zu machen. Auf diese Weise müssen Markov-Modelle auf den Computersystemen, auf denen sie genutzt werden sollen, nicht erst trainiert werden.
+
 \section{Soziale Netze}
 Unter dem Begriff Sozialem Netz versteht man eine Menge an Teilnehmern, häufig sind dies natürliche Personen, und verschiedenen Arten an Relationen zwischen diesen. Das durch die Beziehungen gebildete Netz lässt sich problemlos als Graph darstellen, indem die Teilnehmer als Knoten des Graphen dargestellt und die Beziehungen auf die Kanten abgebildet werden.
 
@@ -21,6 +31,7 @@ Dies ist ausreichend um mittels Verfahren wie Zentralitätsberechnung, Dichte un
 
 \section{Betrugserkennung}
 Graph Datenbanken werden in e-commerce benutzt um die Betrug zu vermeiden. In Graph Datenbanken ist es möglich das Suchen der verdächtigen Pattern einzustellen - die entsprechenden Prüfungen, die mit den verschiedenen Triggern verbunden sind. Diese Triggern lassen sich die Probleme identifizieren, bevor als der ernschafte Schaden getroffen wird. Triggern können aus die nächste Ereignissen besteht werden: Einloggen in System, Registrierung einer neuen Bankkarte oder Bestellung der Waren.
+
 \begin{figure}
 	\caption{Serien von den Transaktionen}
 	\label{fig:Trs}
@@ -38,6 +49,21 @@ Die Effektivität der Empfehlungen hängt von dem Verstehen der Beziehungen zwis
 Eine der ersten Empfehlungsalgorithmen war das System des Internet-Handels Amazon. Ein weiterentwickeltes Empfehlungsalgorithmus wurde von Google hergestellt. In diesem System war erstmal das Sammlungsverfahren der Nutzersinformationen verwendet worden, das cookies während der Besuchung der Suchmaschinen-Website benutzt wird und aufgrund der Suchensergebnisse wurde das Profil für jeden Nutzer aufgebaut.
 
 \section{Verkehrsnetze}
+Im öffentlichen Leben spielen Verkehrsnetze eine wichtige Rolle. So kann der öffentliche Nahverkehr als ein Verkehrsnetz betrachtet werden. Die unterschiedlichen Linien und Haltestellen sind Bestandteil des öffentlichen Nahverkehrs und dienen dazu, Menschen zu transportieren. Jedoch ist es mit steigender Komplexität des Verkehrsnetzes und des Taktes nicht immer einfach, den kürzesten und schnellsten Weg zu finden.
+
+Außerdem lässt sich auch der normale Straßenverkehr als Verkehrsnetz begreifen. Die zahlreichen Straßen bilden ein Netz, welches durch ein Auto flexibel genutzt werden kann. Das Straßen-Verkehrsnetz ist dabei recht kompliziert, so dass es auch hier schwer ist, den besten Weg vom Start- zum Zielort zu finden.
+
+Verkehrsnetze lassen sich als Graphen darstellen. Am Beispiel des öffentlichen Nahverkehrs können Haltestellen als Knoten, sowie die Strecken zwischen den Haltestellen als Kanten bezeichnet werden. Kanten können darüber hinaus gerichtet sein, um die unterschiedlichen Richtungen einer Linie abzubilden. \cite[p.~74 ff.]{bartelme01}
+
+Dabei müssen Graphen für das Verkehrsnetz des öffentlichen Nahverkehrsnetz nicht zwangsläufig die tatsächliche Straßenverkehrsführung wiedergeben. Wenn beispielsweise eine Straße gesperrt wird und ein Autobus eine Umleitung fahren muss, bleiben die Knoten-Kanten-Beziehungen, sofern keine Haltestellen ausfallen und hinzukommen. Auf diese Weise findet also eine Abstraktion des Verkehrsnetzes des öffentlichen Nahverkehrs statt.  \cite[p.~74 ff.]{bartelme01}
+
+Das Verkehrsnetz des Straßenverkehres lässt sich in einer Netztopologie darstellen. Hier stellen Straßen eine Kante dar, sowie Kreuzungen mit anderen Straßen die Knoten. Da Straßen beide oder nur eine Fahrtrichtung beinhalten, sind die Kanten in jedem Fall gerichtet. So entsteht eine komplexe Netztopologie aus Straßen, welche als recht umfangreiche Graphen dargestellt werden. \cite[p.~122]{bartelme01}
+
+Für den Straßenverkehr ist das Anwendungsszenario der Routenplanung ein sehr wichtiges. Navigationssysteme berechnen von einem gegebenen Startort aus, den besten Weg zu einem Zielort. Damit erhält der Anwender eine mögliche Route, mit der er sein Ziel erreichen kann. \cite[p.~122]{bartelme01} Zur Berechnung des Weges werden Graphen benötigt, sowie Verfahren der Traversierung und der Berechnung der kürzesten Wege, beispielsweise durch den Dijkstra-Algorithmus. Bei der Berechnung des besten Weges bei Verkehrsnetzen des öffentlichen Nahverkehrs steigt die Komplexität, da hier jeweils Abfahrts- und Ankunftszeiten bei den jeweiligen Knoten berücksichtigt werden müssen.
+
+Graph-Datenbanken können entsprechende Graphen von Verkehrsnetzen beinhalten. Diese Graph-Datenbanken können dann beispielsweise in Navigationsgeräten gespeichert werden und dort zur Berechnung des kürzesten Weges genutzt werden.
+
+
 \section{Stammdatenmanagement}
 Stammdaten heißen die Daten, die kritisch wichtig für die Geschäftstransaktionen. Die Basisdaten enthält die Daten über die Benutzer, Einkäuferen, Produkten, Lieferanten, Abteilungen, Webseiten, usw. In den größen Organisationen sind solche Daten stark verteilt und heterogen nach den Formaten, Qualität und Zugangsmitteln. Das Stammdatenmanagement enthält die Identifizierung, Löschung, Speicherung und entsprechend Datenverwaltung. Das Stammdatenmanagement soll an der Veränderung der Oraganisationsstruktur, Verschmelzung von den Organisationen, Änderung der Geschäftsregeln usw. angepasst werden. Graph Datenbanken werden gut für die Modelirung, Speicherung, und Anfragen zu den Basismetadaten und Stammdatenmodellen gepasst werden. 
 
