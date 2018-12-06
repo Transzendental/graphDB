@@ -1,6 +1,4 @@
-\setcounter{chapter}{2}
 
-\section{MariaDB mit OQGRAPH} %Kapitel: Graph-Datenbanken - Grundlegende technologische Aspekte (chapter)
 \subsection{Installation}
 In diesem Kapitel wird die Installation und Konfiguration des DBS MaraiDB, sowie des Plugins QOGRAPH auf einem Ubuntu Rechner beschrieben.  
 QOGRAPH wird als Plugin in einem eigenständigem Softwarepaket verteilt. Es ist nicht zwingend nötig den MariaDB-Server explizit zu installieren, dieser ist als Abhängigkeit definiert und wird automatisch mit installiert, wenn keine gültige Installation gefunden wird. Alle benötigten Pakete können mittels apt-get installiert werden.
@@ -14,5 +12,84 @@ INSTALL SONAME 'ha_oqgraph';
 
 Dabei ist zu beachten, dass MaraiDB das User-Directory von Unix nutzt. Dementsprechend kann nur mit root Rechten in die \texttt{mysql} Konsole  gewechselt werden. Es ist also nötig \texttt{sudo} zu verwenden. Damit auch normale User die Datenbank administrieren können, muss das \texttt{unix\_socket} Plugin deaktiviert werden.
 
-\subsection{Grundlegende Funktionsweise}
-\subsection{Aufbau}
+\subsection{Visitenkarte}
+
+\begin{enumerate}
+	\item Allgemein
+	\begin{enumerate}
+		\item Name: MariaDB
+		\item Modell: Storage Engines OQGRAPH
+		\item Version: MariaDB 10.3.11, OQGRAPH 3.0
+		\item Historie: MariaDB enstanden als Abspaltung (Fork) von MySQL, OQGRAPH als Erweiterung zu MariaDB
+		\item Hersteller: MariaDB Corporation, MariaDB Foundation
+		\item Lizenz: GNU
+		\item Quellen: https://mariadb.com/kb/en/library/documentation/, 
+		https://dev.mysql.com/doc/internals/en/client-server-protocol.html
+	\end{enumerate}
+\newpage
+	\item Besonderheiten
+	\begin{enumerate}
+		\item Vergleichbare Systeme: MySQL
+		\item Alleinstellungsmerkmale: OQGRAPH als Erweiterung zu MariaDB
+	\end{enumerate}
+	\item Architektur
+	\begin{enumerate}
+		\item Programmiersprache (des Systems): C, C++, Perl, Bash
+		\item Systemarchitektur: InnoDB, Aria, OQGRAPH
+		\item Betriebsart: Multi-User, Standalone, Cluster
+		\item Protokoll der Schnittstelle: MySQL-Protocol
+		\item API: SQL
+	\end{enumerate}
+	\item Datenmodell
+	\begin{enumerate}
+		\item Standardsprache: SQL
+		\item Objektbegriff: Tabellen, Spalten, Zeilen, Attribute
+		\item Sichten: VIEW
+		\item Datentypen: Numeric, String, Date, Time, ...
+		\item Externe Dateien: BLOB (MEDIUMBLOB, LONGBLOB), TEXT (MEDIUMTEXT, LONGTEXT), JSON
+		\item Schlüssel: Primär und Fremd
+		\item Semantisch unterschiedliche Beziehungen - Generalisierung, Spezifizierung, eigens definierte Constraints
+		\item Sonstige Constraints - NOT NULL, PRIMARY KEY, UNIQUE, CHECK
+	\end{enumerate}
+	\item Indexe
+	\begin{enumerate}
+		\item Sekundärindexe: Plain Indexe, Full-Text Indexe
+		\item Historische Daten: Transaktionsverwaltung, Logs
+		\item Gespeicherte Prozeduren: SQL-Procedures
+		\item Triggermechanismen: SQL-Trigger
+		\item Versionierung: SYSTEM VERSIONING
+	\end{enumerate}
+	\item Anfragemethode
+	\begin{enumerate}
+		\item Kommunikation, Protokoll: HTTP/HTTPS, SSH, MySQL-Protocol, TCP/IP
+		\item CRUD-Operationen: SQL (CREATE, INSERT, SELECT, UPDATE, ALTER, DELETE)
+		\item Ad-hoc-Anfragen: Innerhalb spezieller Datenbank-Engines möglich (Casandra, ColumnStore)
+		\item Kopplungstechniken: JOIN, UNION
+		\item Map/Reduce: Nicht vorhanden
+	\end{enumerate}
+	\item Horizontale Skalierbarkeit
+	\begin{enumerate}
+		\item Konfiguration: Datenbank-Engine MaxScale
+		\item Sharding: Spider, CONNECT oder Galera
+		\item Replikation: GTID (Global Transaction Identifier), Master-Slave-Replikation
+	\end{enumerate}
+	\item Konsistenz
+	\begin{enumerate}
+		\item ACID: Erfüllt
+		\item Transaktionen: SQL-Standard-Transactions
+		\item Nebenläufigkeit (Synchronisation): Vorhanden
+		\item Dauerhaftigkeit: Ja
+		\item Konfliktbehandlung Replikation: Master-Slave-Replikation, Multi-Soruce-Replication
+	\end{enumerate}
+	\item Administration
+	\begin{enumerate}
+		\item Werkzeuge: PHPmyAdmin
+		\item Massendatenimport: Load-Data-Infile, CONNECT-Engine
+		\item Datensicherheit: Save-Data-Infile, MYSQL-Dump (Logisches Backup), MYSQl-Hotcopy (physikalisches Backup)
+		\item Recovery: Engines XtraDB/InnoDB Recovery-Mode
+		\item Komprimierung: Je nach Storage Engine
+		\item Authentifizierung - In MariaDB integriert, Plugins: ed25519, GSSAPI, NamedPipe, PAM
+		\item Mandantenfähigkeit: User / getrennte Datenbanken
+	\end{enumerate}
+\end{enumerate}
+
