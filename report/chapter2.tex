@@ -1,4 +1,3 @@
-
 \subsection{Installation}
 In diesem Kapitel wird die Installation und Konfiguration des DBS MaraiDB, sowie des Plugins QOGRAPH auf einem Ubuntu Rechner beschrieben.  
 QOGRAPH wird als Plugin in einem eigenständigem Softwarepaket verteilt. Es ist nicht zwingend nötig den MariaDB-Server explizit zu installieren, dieser ist als Abhängigkeit definiert und wird automatisch mit installiert, wenn keine gültige Installation gefunden wird. Alle benötigten Pakete können mittels apt-get installiert werden.
@@ -13,24 +12,22 @@ INSTALL SONAME 'ha_oqgraph';
 Dabei ist zu beachten, dass MaraiDB das User-Directory von Unix nutzt. Dementsprechend kann nur mit root Rechten in die \texttt{mysql} Konsole  gewechselt werden. Es ist also nötig \texttt{sudo} zu verwenden. Damit auch normale User die Datenbank administrieren können, muss das \texttt{unix\_socket} Plugin deaktiviert werden.
 
 \subsection{Visitenkarte}
-
 \begin{enumerate}
 	\item Allgemein
 	\begin{enumerate}
 		\item Name: MariaDB
 		\item Modell: Storage Engines OQGRAPH
 		\item Version: MariaDB 10.3.11, OQGRAPH 3.0
-		\item Historie: MariaDB enstanden als Abspaltung (Fork) von MySQL, OQGRAPH als Erweiterung zu MariaDB
+		\item Historie: MariaDB enstanden als Abspaltung (Fork) von MySQL, OQGRAPH als Plugin von MariaDB
 		\item Hersteller: MariaDB Corporation, MariaDB Foundation
 		\item Lizenz: GNU
 		\item Quellen: https://mariadb.com/kb/en/library/documentation/, 
 		https://dev.mysql.com/doc/internals/en/client-server-protocol.html
 	\end{enumerate}
-\newpage
 	\item Besonderheiten
 	\begin{enumerate}
 		\item Vergleichbare Systeme: MySQL
-		\item Alleinstellungsmerkmale: OQGRAPH als Erweiterung zu MariaDB
+		\item Alleinstellungsmerkmale: OQGRAPH Grapherweiterung auf SQL Basis
 	\end{enumerate}
 	\item Architektur
 	\begin{enumerate}
@@ -44,12 +41,12 @@ Dabei ist zu beachten, dass MaraiDB das User-Directory von Unix nutzt. Dementspr
 	\begin{enumerate}
 		\item Standardsprache: SQL
 		\item Objektbegriff: Tabellen, Spalten, Zeilen, Attribute
-		\item Sichten: VIEW
-		\item Datentypen: Numeric, String, Date, Time, ...
+		\item Sichten: Views
+		\item Datentypen: Numeric, String, Date (in diversen Ausprägungen)
 		\item Externe Dateien: BLOB (MEDIUMBLOB, LONGBLOB), TEXT (MEDIUMTEXT, LONGTEXT), JSON
-		\item Schlüssel: Primär und Fremd
-		\item Semantisch unterschiedliche Beziehungen - Generalisierung, Spezifizierung, eigens definierte Constraints
-		\item Sonstige Constraints - NOT NULL, PRIMARY KEY, UNIQUE, CHECK
+		\item Schlüssel: Primär und Fremdschlüssel
+		\item Semantisch unterschiedliche Beziehungen: Assoziation, Generalisierung, Spezifizierung
+		\item Sonstige Constraints: Not Null, Check
 	\end{enumerate}
 	\item Indexe
 	\begin{enumerate}
@@ -61,7 +58,7 @@ Dabei ist zu beachten, dass MaraiDB das User-Directory von Unix nutzt. Dementspr
 	\end{enumerate}
 	\item Anfragemethode
 	\begin{enumerate}
-		\item Kommunikation, Protokoll: HTTP/HTTPS, SSH, MySQL-Protocol, TCP/IP
+		\item Kommunikation, Protokoll: MySQL-Protocol (TCP/IP)
 		\item CRUD-Operationen: SQL (CREATE, INSERT, SELECT, UPDATE, ALTER, DELETE)
 		\item Ad-hoc-Anfragen: Innerhalb spezieller Datenbank-Engines möglich (Casandra, ColumnStore)
 		\item Kopplungstechniken: JOIN, UNION
@@ -88,8 +85,13 @@ Dabei ist zu beachten, dass MaraiDB das User-Directory von Unix nutzt. Dementspr
 		\item Datensicherheit: Save-Data-Infile, MYSQL-Dump (Logisches Backup), MYSQl-Hotcopy (physikalisches Backup)
 		\item Recovery: Engines XtraDB/InnoDB Recovery-Mode
 		\item Komprimierung: Je nach Storage Engine
-		\item Authentifizierung - In MariaDB integriert, Plugins: ed25519, GSSAPI, NamedPipe, PAM
-		\item Mandantenfähigkeit: User / getrennte Datenbanken
+		\item Authentifizierung: In MariaDB integriert, Plugins: ed25519, GSSAPI, NamedPipe, PAM
+		\item Mandantenfähigkeit: User und Rechtekonzept, getrennte Datenbanken
 	\end{enumerate}
 \end{enumerate}
+
+\subsection{Grundlegende Funktionsweise des Systems}
+OQGRAPH ist ein Plugin, welches auf das normale relationale System von MariaDB aufbaut. Eine Graphdatenbank besteht prinzipiell lediglich aus zwei Tabellen. Eine Backing-Tabelle welche die Graphdaten in der Form von Kanten enthält und eine API-Tabelle auf die nur lesend zugegriffen werden kann. Diese zwei Tabellen werden im folgenden genauer beschrieben.
+
+Die Backing-Tabelle ist eine normale relationale SQL Tabelle. Konkrete Anforderungen an diese bestehen nicht. Allerdings ist zu beachten das die API-Tabelle Daten aus Backing-Tabelle ließt und entsprechend gemappt werden muss. Damit dies gelingt muss die Tabelle jeweils eine \emph{not null numeric} Spalte für den Start- und Endknoten einer Kante bereitstellen. Es kann auch ein Kantengewicht gespeichert werden, OQGRAPH erwartet einen \emph{double} Wert. Darüber hinaus kann die Backing-Tabelle weitere beliebige Attribute enthalten. Es empfiehlt sich aber einen zusammengesetzten Primärschlüssel auf den beiden Kantenknoten zu definieren. % ---- Index auf dest, recherece zusammengesetezer pk wie index funktionierr
 
