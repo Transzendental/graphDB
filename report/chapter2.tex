@@ -90,8 +90,24 @@ Dabei ist zu beachten, dass MaraiDB das User-Directory von Unix nutzt. Dementspr
 	\end{enumerate}
 \end{enumerate}
 
-\subsection{Grundlegende Funktionsweise des Systems}
+\subsection{Grundlegende Funktionsweise des Systems}\label{chp:funktionsweise}
 OQGRAPH ist ein Plugin, welches auf das normale relationale System von MariaDB aufbaut. Eine Graphdatenbank besteht prinzipiell lediglich aus zwei Tabellen. Eine Backing-Tabelle welche die Graphdaten in der Form von Kanten enthält und eine API-Tabelle auf die nur lesend zugegriffen werden kann. Diese zwei Tabellen werden im folgenden genauer beschrieben.
 
-Die Backing-Tabelle ist eine normale relationale SQL Tabelle. Konkrete Anforderungen an diese bestehen nicht. Allerdings ist zu beachten das die API-Tabelle Daten aus Backing-Tabelle ließt und entsprechend gemappt werden muss. Damit dies gelingt muss die Tabelle jeweils eine \emph{not null numeric} Spalte für den Start- und Endknoten einer Kante bereitstellen. Es kann auch ein Kantengewicht gespeichert werden, OQGRAPH erwartet einen \emph{double} Wert. Darüber hinaus kann die Backing-Tabelle weitere beliebige Attribute enthalten. Es empfiehlt sich aber einen zusammengesetzten Primärschlüssel auf den beiden Kantenknoten zu definieren. % ---- Index auf dest, recherece zusammengesetezer pk wie index funktionierr
+Die Backing-Tabelle ist eine normale relationale SQL Tabelle. Konkrete Anforderungen an diese bestehen nicht. Allerdings ist zu beachten das die API-Tabelle Daten aus Backing-Tabelle ließt und entsprechend gemappt werden muss. Damit dies gelingt muss die Tabelle jeweils eine \emph{not null numeric} Spalte für den Start- und Endknoten einer Kante bereitstellen. Es kann auch ein Kantengewicht gespeichert werden, OQGRAPH erwartet einen \emph{double} Wert. Darüber hinaus kann die Backing-Tabelle weitere beliebige Attribute enthalten. Es empfiehlt sich aber einen zusammengesetzten Primärschlüssel auf den beiden Kantenknoten zu definieren. Des Weiteren sorgt ein zusätzlicher Index auf dem Endknoten für optimale Performance bei den von OQGRAPH bereitgestellten Graphalgorithmen. Eine beispielhafte Implementierung des Schemas ist im Anhang \ref{schemaBacking} zu finden.
+
+Die Api-Tabelle ist aus technischer Sicht ebenfalls nur eine SQL-Tabelle, ihre Aufgabe ist aber die Kapselung der datenhaltende Backing-Tabelle und das bereitstellen diverser Graphalgorithmen. Das Schema dieser Tabelle ist komplett vorgegeben und muss so übernommen werden, eine entsprechende Vorlage ist Anhang \ref{schemaApi} zu finden. Auf dieser Tabelle können mittels SQL-Syntax Graphalgorithmen durchgeführt werden. Die geschieht über ein Select auf der API-Tabelle, über die Where-Klausel können Argumente an die Algorithmen übergeben werden. Das Latch Attribut bestimmt den konkreten Algorithmus, \emph{origid} und \emph{destid} sind die Start und Endpunkte. In der folgenden Tabelle sind alle von OQGRAPH bereitgestellten Operationen aufgelistet.
+
+\begin{tabularx}{\textwidth}{l l X}
+	\textbf{Latch Wert }    & \textbf{Where-Klausel}  & \textbf{Graphoperation} \\
+	\hline
+	(empty string) & origid         & List all first hop vertices from origid in linkid column. \\
+	dijkstras      & origid, destid & Find shortest path using Dijkstras algorithm between origid and destid, with traversed vertex ids in linkid column. \\
+	dijkstras      & origid         & Find all vertices reachable from origid, listed in linkid column, and report sum of weights of vertices on path to given vertex in weight. \\
+	dijkstras      & destid         & Find all vertices from which a path can be found to destid, listed in linkid column, and report sum of weights of vertices on path to given vertex in weight. \\
+	breadth\_first & origid         & List vertices reachable from origid in linkid column. \\
+	breadth\_first & destid         & List vertices from which a path can be found to destid in linkid column. \\
+	breadth\_first & origid, destid & Find shortest path between origid and destid, report in linkid column. \\
+	leaves         & origid         & List vertices reachable from origid, that only have incoming edges. \\
+	leaves         & destid         & List vertices from which a path can be found to destid, that only have outgoing edges.
+\end{tabularx}
 

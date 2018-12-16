@@ -1,9 +1,17 @@
-\subsection{Einrichtung des Grundschemas}
-OQGRAPH wird als Engine beschrieben, welche dem Nutzer die Handhabung hierarchische Strukturen (Bäume) und komplexe Graphen (zahlreiche Kanten) ermöglichen soll \cite{oqgraph}. Dieser Aussage wird OQGRAPH, insbesondere im erstem Punkt, nicht gerecht. 
+In diesem Kapitel wird beschrieben wie das semantische Schema einer typische OLTP-Anwendung, also ein System welches traditionell mit relationalen Datenbanken arbeitet, in ein Graph-Schema von MariaDBs OQGRAPH überführt werden kann. Als Beispiel dient ein Onlineforum, in dem Mitglieder Beiträge verfassen und kommentieren können. In den folgenden Abschnitten wird das ensprechnde Datenbankschema konzipiert, sowie diverse typische Usecases für ein solches Forum erläutert und implementiert. Die Verwendung dieser Usecases erfolgt über einem entferntem PHP-Client, welcher ebenfalls kurz vorgestellt wird.
 
-% Der Grund dafür ... nur kanten gespeichert ...
+\subsection{Konzeption des Schema}
+OQGRAPH wird als Engine beschrieben, welche dem Nutzer die Handhabung hierarchische Strukturen (Bäume) und komplexe Graphen (zahlreiche Kanten) ermöglichen soll \cite{oqgraph}. Dieser Aussage wird OQGRAPH, insbesondere im erstem Punkt, nicht gerecht. Die Grundlegende Funktionsweise des Systems wird in Kapitel \ref{chp:funktionsweise} beschrieben.
 
-%- key auf node-IDs in relationaler Knoten tabelle
+Das Kernproblem von OQGRAPH, welches die Modellierung hierarchischer Strukturen betrifft, ist das Knoten nicht, beziehungsweise nicht explizit gespeichert werden. Lediglich ein numerischer Wert welcher den Knoten repräsentiert wird vorgehalten. Die resultiert in zwei Problemen. Zum einen kann nicht zwischen unterschiedlichen Knotenausprägungen (z. B. Kommentar und Beitrag) unterschieden werden. Dementsprechend ist es auch nicht möglich Knoten bei der Traversierung zu filtern. 
+
+Zum anderen werden die Knoten in OQGRAPH durch eine globale Objektinstanz repräsentiert. Relationale Schema arbeiten aber typischerweise mit einen lokalen Identifikator. Das heißt es ist ein explizites Mapping nötig, wenn der OQGRAPH Knoten mit dem zugehörigen Nutzdatensatz in Verbindung gebracht werden soll. Möchte man diese Daten also zusammenführen ist ein Join notwendig. Graphdatenbanken sind aber so performant weil es eben nicht nötig ist Datensätze zu über einen Join zusammenzuführen.
+
+Aufgrund dieser Limitierungen ist OQGRAPG ungeeignet für die Umsetzung komplexer Schemata. Um dies weiter auszuführen wurde ein OQGRAPH kompatibles Schema erstellt. In wie fern damit Usecases umgesetzt werden können, beziehungsweise wie Workarounds aussehen und mit Limitierungen umzugehen ist, wird in den folgenden Abschnitten vorgestellt.
+
+Abbildung \ref{fig:ERModel} zeigt das konzeptionelle Schema unserer Beispielanwendung Gästebuch. Die drei Objekte Mitglied, Benutzer und Kommentar werden in relationalen Tabellen gespeichert und bekommen einen lokal gültigen Primärschlüssel. Aber anstatt eines Fremdschlüssels auf die entsprechende Beziehungstabelle halten diese eine global eindeutige Objektidentität vor welche in der Backing-Tabelle von OQGRAPH verwendet werden. Dieser Identifier wird durch eine separate Sequenz verwaltet, ein Index auf diesem ermöglicht des Weiteren schnelles Auffinden der Nutzdaten zu den von dem Graphalgohritmus gefundenen Ergebnissen. Die Relationen werden durch OQGRAPH verwaltet, zu dein eigentlichen Kanten wird auch Relationstyp gespeichert, so das bekannt ist welcher Ausprägung der Zielknoten hat und so die Nutzdaten direkt aus der entsprechenden Tabelle geladen werden können.
+
+Das komplette SQL-Schema, inklusive Installationsprotokoll auf dem Hochschulrechner, ist im Anhang \ref{todo} zu finden.
 
 \subsection{Umsetzung eines Clients}
 Bei der Entwicklung eines Clients für die Graph-Datenbank des Gästebuchsystems wurde sich für eine Webanwendung entschieden. Webanwendungen können über den Webbrowser aufgerufen und genutzt werden. Sie stehen damit einer Vielzahl von Nutzern zur Verfügung. Ein weiter Vorteil von Webanwendungen ist, dass die Entwicklung des User Interfaces nicht sehr aufwendig ist. Es müssen lediglich gängige Technologien der Webentwicklung für User Interfaces herangezogen werden, die dann schließlich vom Webbrowser interpretiert werden.

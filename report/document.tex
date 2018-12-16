@@ -62,6 +62,8 @@ keepaspectratio]{images/Logo_H-BRS_background}%
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{12pt}
 
+\usepackage{tabularx}
+
 % #####
 % #
 % # START config area
@@ -108,7 +110,7 @@ keepaspectratio]{images/Logo_H-BRS_background}%
 \input{abstract}
 
 % load the preamble
-%\input{preamble}
+\input{preamble}
 
 % loads the fancy pagestyle for register part
 \input{fancyRegisterPart}
@@ -154,30 +156,30 @@ keepaspectratio]{images/Logo_H-BRS_background}%
 % #####
 % # load the appendix from the files
 % #####
-%\input{appendix}
+\input{appendix}
 
 % #####
 % # list of table, list of figures, and list of listings in ToC
 % #####
-%\newpage
-%\addcontentsline{toc}{chapter}{Abbildungsverzeichnis}
-%\listoffigures
-%\newpage
-%\addcontentsline{toc}{chapter}{Tabellenverzeichnis}
-%\listoftables
-%\newpage
-%\addcontentsline{toc}{chapter}{Listings}
-%\lstlistoflistings
+\newpage
+\addcontentsline{toc}{chapter}{Abbildungsverzeichnis}
+\listoffigures
+\newpage
+\addcontentsline{toc}{chapter}{Tabellenverzeichnis}
+\listoftables
+\newpage
+\addcontentsline{toc}{chapter}{Listings}
+\lstlistoflistings
 
 % #####
 % # List of Abbreviations
 % #####
-%\phantomsection 
-%\addcontentsline{toc}{chapter}{Abkürzungsverzeichnis}
-%\renewcommand\refname{Abkürzungsverzeichnis} 
-%\chapter*{Abkürzungsverzeichnis}
-%\input{abbreviations}
-%\newpage
+\phantomsection 
+\addcontentsline{toc}{chapter}{Abkürzungsverzeichnis}
+\renewcommand\refname{Abkürzungsverzeichnis} 
+\chapter*{Abkürzungsverzeichnis}
+\input{abbreviations}
+\newpage
 
 % #####
 % # load the bibliography

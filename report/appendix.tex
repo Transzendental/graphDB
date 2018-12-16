@@ -1,7 +1,38 @@
 \appendix
 \chapter{Anhang}
-Appendix
-\section{Erster Teil}
-\section{Zweiter Teil}
-\chapter{Anhang}
-Appendix
+\section{Schema für die OQGRAPH Backing-Tabelle}\label{schemaBacking}
+\begin{lstlisting}
+CREATE TABLE oq2_backing (
+  origid INT UNSIGNED NOT NULL, 
+  destid INT UNSIGNED NOT NULL, 
+  weight DOUBLE NOT NULL, 
+  PRIMARY KEY (origid, destid), 
+  KEY (destid)
+);	
+\end{lstlisting}
+\section{Schema für die OQGRAPH API-Tabelle}\label{schemaApi}
+\begin{lstlisting}
+CREATE TABLE oq_graph
+ENGINE=OQGRAPH 
+data_table='oq_backing' 
+origid='origid'
+destid='destid' 
+weight='weight';
+\end{lstlisting}
+Für MariaDB Versionen älter als 10.1.2 müssen die Attribute manuell spezifiziert werden.
+\begin{lstlisting}
+CREATE TABLE oq_graph (
+  latch VARCHAR(32) NULL,
+  origid BIGINT UNSIGNED NULL,
+  destid BIGINT UNSIGNED NULL,
+  weight DOUBLE NULL,
+  seq BIGINT UNSIGNED NULL,
+  linkid BIGINT UNSIGNED NULL,
+  KEY (latch, origid, destid) USING HASH,
+  KEY (latch, destid, origid) USING HASH
+) ENGINE=OQGRAPH 
+data_table='oq_backing' 
+origid='origid' 
+destid='destid' 
+weight='weight';	
+\end{lstlisting}
