@@ -1,7 +1,122 @@
+In diesem Abschnitt wird auf die Performanz von OLAP-Anwendungen in MariaDB-Datenbanksysteme mit OQGRAPH als Erweiterung eingegangen. Als OLAP-Testszenario werden Profile aus Datensätzen verschiedener Plattformen herangezogen. Diese Profile dienen fortlaufend als Knoten. Diese Knoten werden dann in weiteren Datensätzen über Kanten miteinander verbunden. Diese Kanten beinhalten außerdem zusätzliche Informationen, wie die Art der Beziehung, sowie ein Datum.
 
-\subsection{Implementierung der Datenbank}
+Die Daten sind den Plattformen "Facebook", "Wikipedia", "Epinions", "YouTube" und "LifeJournal" zugeordnet. Die entsprechenden Datensätze beinhalten alle eine unterschiedliche Anzahl an Knoten und Kanten.
+
+\subsection{Implementierung der Datenbanken}
+
+Für die Performanztests von MariaDB mit der OQGRAPH-Erweiterung wird der zur Verfügung stehende Cluster genutzt. Details zur Installation von MariaDB und der OQGRAPH-Erweiterung können dem Abschnitt \ref{Installation} entnommen werden. Es wird also ein bereits bestehendes MariaDB-Datenbanksystem genutzt, welches bis hierhin nur für die Implementierung der OLTP-Anwendung genutzt wurde. Um die Performanztests nicht zu verfälschen, wurde das MariaDB-Datenbanksystem für die Dauer der Tests nicht anderweitig genutzt.
+
+Um die Datensätze voneinander zu abstrahieren und um die Performanztests voneinander unabhängig durchzuführen, wurde für jede Plattform jeweils eine Datenbank angelegt. In den fünf Datenbanken befinden sich jeweils zwei Tabellen.
+
+Die Tabelle "profil" beinhaltet alle Profile aus den Datensätzen der jeweiligen Plattformen. Jede Zeile in der Tabelle stellt hierbei einen Knoten dar. Dabei stellt die Tabelle "profil" noch weitere Informationen zum Knoten zur Verfügung, wie den Vor- und Nachnamen, sowie das Gender, das Geburtsdatum und das Land.
+
+In der Tabelle "oq\_backing" werden die Kantenbeziehungen zwischen den einzelnen Knoten gespeichert. Dabei folgt die Tabelle der Namenskonvention der OQGRAPH-Erweiterung. Die Spalte "origid" referenziert hierbei auf den Ausgangsknoten, von dem eine gerichtete Kante zum Zielknoten ausgeht, welcher in "destid" referenziert wird. Außerdem werden in den Spalten "rtype" und "date" weitere Informationen zur Kantenbeziehung gespeichert.
+
+Für den Import der Zeilen aus den CSV-Datensätzen in die Datenbank wurde die Datenbank-IDE DataGrip genutzt. Beim CSV-Import wandelt die DataGrip-IDE die CSV-Datei in mehrere Insert-SQL-Statements um und führt diese Statements in der ausgewählten Datenbank aus. So wurden schließlich alle Zeilen aus den CSV-Dateien in die Datenbank importiert.
+
+Die Anzahl der Zeilen in den Tabellen der verschiedenen Datenbanken kann der folgenden Auflistung entnommen werden.
+
+\begin{center}
+	\begin{tabular}{l|l l l l l }
+		& Facebook & Wikipedia & Epinions & YouTube & LifeJournal \\
+		\hline
+		profil & 4.039 & 7.115 & 75.879 & 1.134.890 & 3.997.962 \\
+		oq\_backing & 88.234 & 100.762 & 405.740 & 2.987.624 & 34.681.189 \\
+	\end{tabular}
+\end{center}
+
 \subsection{Versuchsaufbau und Metriken}
+
+Im Rahmen des Performanztests wird die Dauer einer einzelnen Operation als Metrik herangezogen. Hierbei wird die Zeit gemessen, die eine Operation in Form eines SQL-Statements benötigt. Hierbei kann es aber auch zu ausreißenden Beobachtungen kommen. Ausreißer können entstehen, weil das MariaDB-Datenbanksystem eine SQL-Abfrage nicht immer gleich und deshalb diese nicht immer über eine konstant gleichbleibende Dauer ausführt.
+
+Es ist daher wichtig den Einfluss von Ausreißern möglichst zu minimieren. Aus diesem Grund werden die Messungen mehrmals durchgeführt und anschließend der durchschnittliche Zeitbedarf berechnet. Je nach Zugriffsart finden weitere Messungen statt. So werden bei Projektionen und Selektionen unterschiedliche Stellen der Tabellen abgefragt, da Abfragen auf den Beginn oder das Ende der Tabelle die Messungen verfälschen würde.
+
+Die Mess-Vorgänge wurden in SQL-Prozeduren definiert. Diese Prozeduren übernehmen die Zeitmessung, die Speicherung der Messwerte, sowie die Ermittlung des Durchschnittes. Die Messergebnisse werden dabei in einer weiteren Tabelle "analysis" gespeichert, die auf jeder Datenbank erstellt wurde. Die Prozeduren werden dann mittels des "CALL"-SQL-Befehls aufgerufen.
+
+\subsection{Annahmen}
+
 \subsection{Performance-Messung}
+
 \subsubsection{Projektion und Selektion}
+
+Die Standardprozedur für die Projektion und Selektion ist wie folgt aufgebaut:
+
+\begin{lstlisting}
+DROP PROCEDURE IF EXISTS analysis;
+CREATE PROCEDURE analysis ()
+	BEGIN
+	DECLARE c INT;
+	DECLARE t1 BIGINT;
+	DECLARE t2 BIGINT;
+	DECLARE td INT;
+	DECLARE x INT;
+	DECLARE i INT DEFAULT 0;
+	DECLARE a INT;
+	
+	DELETE FROM analysis;
+	SELECT count(*) INTO c FROM profil;
+	
+	WHILE (i < 5) DO
+		SET x = 1;
+		WHILE (x < c) DO
+			SELECT UNIX\_TIMESTAMP(CURTIME(6))*1000000 INTO t1;
+			
+			//Zu messende Operation
+			
+			SELECT UNIX\_TIMESTAMP(CURTIME(6))*1000000 INTO t2;
+			
+			SELECT t2-t1 INTO td;
+			
+			INSERT INTO analysis VALUES (CONCAT(i,x), td);
+							
+			SET x = x+1000;
+		END WHILE;
+			
+		SET i = i+1;
+	END WHILE;
+	
+	SELECT AVG(time) INTO a FROM analysis;
+	DELETE FROM analysis;
+	INSERT INTO analysis VALUES (0, a);
+END;
+\end{lstlisting}
+
 \subsubsection{Aggregation}
+
+Die Standardprozedur für die Projektion und Selektion ist wie folgt aufgebaut:
+
+\begin{lstlisting}
+DROP PROCEDURE IF EXISTS analysis;
+CREATE PROCEDURE analysis ()
+	BEGIN
+	DECLARE c INT;
+	DECLARE t1 BIGINT;
+	DECLARE t2 BIGINT;
+	DECLARE td INT;
+	DECLARE i INT DEFAULT 0;
+	DECLARE a INT;
+		
+	DELETE FROM analysis;
+	SELECT count(*) INTO c FROM profil;
+		
+	WHILE (i < 100) DO
+		SELECT UNIX\_TIMESTAMP(CURTIME(6))*1000000 INTO t1;
+		
+		//Zu messende Operation
+		
+		SELECT UNIX\_TIMESTAMP(CURTIME(6))*1000000 INTO t2;
+		
+		SELECT t2-t1 INTO td;
+		
+		INSERT INTO analysis VALUES (i, td);
+		
+		SET i = i+1;
+	END WHILE;
+	
+	SELECT AVG(time) INTO a FROM analysis;
+	DELETE FROM analysis;
+	INSERT INTO analysis VALUES (0, a);
+END;
+\end{lstlisting}
+
 \subsubsection{Traversierung}
