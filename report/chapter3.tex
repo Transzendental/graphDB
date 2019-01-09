@@ -1,4 +1,11 @@
-In diesem Kapitel wird beschrieben wie das semantische Schema einer typische OLTP-Anwendung, also ein System welches traditionell mit relationalen Datenbanken arbeitet, in ein Graph-Schema von MariaDBs OQGRAPH überführt werden kann. Als Beispiel dient ein Onlineforum, in dem Mitglieder Beiträge verfassen und kommentieren können. In den folgenden Abschnitten wird das ensprechnde Datenbankschema konzipiert, sowie diverse typische Usecases für ein solches Forum erläutert und implementiert. Die Verwendung dieser Usecases erfolgt über einem entferntem PHP-Client, welcher ebenfalls kurz vorgestellt wird.
+In diesem Kapitel wird beschrieben wie das semantische Schema einer typische OLTP-Anwendung, also ein System welches traditionell mit relationalen Datenbanken arbeitet, in ein Graph-Schema von MariaDBs OQGRAPH überführt werden kann. Als Beispiel dient ein Diskussionsforum, in dem Mitglieder Beiträge verfassen und kommentieren können. Abbildung \ref{fig:semanticSchema} zeigt das semantische Schema des Forums. In den folgenden Abschnitten wird das ensprechnde Datenbankschema konzipiert, sowie diverse typische Usecases für ein solches Forum erläutert und implementiert. Die Verwendung dieser Usecases erfolgt über einem entferntem PHP-Client, welcher ebenfalls kurz vorgestellt wird.
+
+\begin{figure}
+	\caption{Semantisches Schema der Beispielwendung: Diskussionsforum}
+	\centering
+	\includegraphics[width=0.6\textwidth]{images/semantischesSchema.png}
+	\label{fig:semanticSchema}
+\end{figure}
 
 \subsection{Konzeption des Schema}
 OQGRAPH wird als Engine beschrieben, welche dem Nutzer die Handhabung hierarchische Strukturen (Bäume) und komplexe Graphen (zahlreiche Kanten) ermöglichen soll \cite{oqgraph}. Dieser Aussage wird OQGRAPH, insbesondere im erstem Punkt, nicht gerecht. Die Grundlegende Funktionsweise des Systems wird in Kapitel \ref{chp:funktionsweise} beschrieben.
@@ -9,9 +16,17 @@ Zum anderen werden die Knoten in OQGRAPH durch eine globale Objektinstanz reprä
 
 Aufgrund dieser Limitierungen ist OQGRAPG ungeeignet für die Umsetzung komplexer Schemata. Um dies weiter auszuführen wurde ein OQGRAPH kompatibles Schema erstellt. In wie fern damit Usecases umgesetzt werden können, beziehungsweise wie Workarounds aussehen und mit Limitierungen umzugehen ist, wird in den folgenden Abschnitten vorgestellt.
 
-Abbildung \ref{fig:ERModel} zeigt das konzeptionelle Schema unserer Beispielanwendung Gästebuch. Die drei Objekte Mitglied, Benutzer und Kommentar werden in relationalen Tabellen gespeichert und bekommen einen lokal gültigen Primärschlüssel. Aber anstatt eines Fremdschlüssels auf die entsprechende Beziehungstabelle halten diese eine global eindeutige Objektidentität vor welche in der Backing-Tabelle von OQGRAPH verwendet werden. Dieser Identifier wird durch eine separate Sequenz verwaltet, ein Index auf diesem ermöglicht des Weiteren schnelles Auffinden der Nutzdaten zu den von dem Graphalgohritmus gefundenen Ergebnissen. Die Relationen werden durch OQGRAPH verwaltet, zu dein eigentlichen Kanten wird auch Relationstyp gespeichert, so das bekannt ist welcher Ausprägung der Zielknoten hat und so die Nutzdaten direkt aus der entsprechenden Tabelle geladen werden können.
+Abbildung \ref{fig:logicSchema} zeigt das konzeptionelle Schema unserer Beispielanwendung Diskussionsforum. Die drei Objekte Mitglied, Benutzer und Kommentar werden in relationalen Tabellen gespeichert und bekommen einen lokal gültigen Primärschlüssel. Aber anstatt eines Fremdschlüssels auf die entsprechende Beziehungstabelle halten diese eine global eindeutige Objektidentität vor welche in der Backing-Tabelle von OQGRAPH verwendet werden. Dieser Identifier wird durch eine separate Sequenz verwaltet, ein Index auf diesem ermöglicht des Weiteren schnelles Auffinden der Nutzdaten zu den von dem Graphalgohritmus gefundenen Ergebnissen. Die Relationen werden also als Kanten durch das OQGRAPH verwaltet, zu den eigentlichen Kanten (Start/Endknoten, Gewicht) wird auch Relationstyp gespeichert, so das bekannt ist welcher Ausprägung der Zielknoten hat und so die Nutzdaten direkt aus der entsprechenden Tabelle geladen werden können. Da die referenzierte Nutzdatentabelle über den Relationstyp aufgelöst werden muss, kann auch nicht durch die DB referentielle 
+Integrität gewährleistet werden.
 
-Das komplette SQL-Schema, inklusive Installationsprotokoll auf dem Hochschulrechner, ist im Anhang \ref{todo} zu finden.
+\begin{figure}
+	\caption{Logisches Schema der Beispielwendung: Diskussionsforum}
+	\centering
+	\includegraphics[width=0.9\textwidth]{images/logischesSchema.png}
+	\label{fig:logicSchema}
+\end{figure}
+ 
+Das komplette SQL-Schema, sowie des Installationsprotokoll auf dem Hochschulrechner, ist im Anhang \ref{todo} zu finden.
 
 \subsection{Umsetzung eines Clients}
 Bei der Entwicklung eines Clients für die Graph-Datenbank des Gästebuchsystems wurde sich für eine Webanwendung entschieden. Webanwendungen können über den Webbrowser aufgerufen und genutzt werden. Sie stehen damit einer Vielzahl von Nutzern zur Verfügung. Ein weiter Vorteil von Webanwendungen ist, dass die Entwicklung des User Interfaces nicht sehr aufwendig ist. Es müssen lediglich gängige Technologien der Webentwicklung für User Interfaces herangezogen werden, die dann schließlich vom Webbrowser interpretiert werden.
