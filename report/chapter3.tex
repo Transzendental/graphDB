@@ -1,9 +1,9 @@
 In diesem Kapitel wird beschrieben wie das semantische Schema einer typische OLTP-Anwendung, also ein System welches traditionell mit relationalen Datenbanken arbeitet, in ein Graph-Schema von MariaDBs OQGRAPH überführt werden kann. Als Beispiel dient ein Diskussionsforum, in dem Mitglieder Beiträge verfassen und kommentieren können. Abbildung \ref{fig:semanticSchema} zeigt das semantische Schema des Forums. In den folgenden Abschnitten wird das ensprechnde Datenbankschema konzipiert, sowie diverse typische Usecases für ein solches Forum erläutert und implementiert. Die Verwendung dieser Usecases erfolgt über einem entferntem PHP-Client, welcher ebenfalls kurz vorgestellt wird.
 
 \begin{figure}
-	\caption{Semantisches Schema der Beispielwendung: Diskussionsforum}
 	\centering
-	\includegraphics[width=0.6\textwidth]{images/semantischesSchema.png}
+	\includegraphics[width=0.6\textwidth]{images/semantischesSchema.png}	
+	\caption{Semantisches Schema der Beispielwendung: Diskussionsforum}
 	\label{fig:semanticSchema}
 \end{figure}
 
@@ -19,10 +19,10 @@ Aufgrund dieser Limitierungen ist OQGRAPG ungeeignet für die Umsetzung komplexe
 Abbildung \ref{fig:logicSchema} zeigt das konzeptionelle Schema unserer Beispielanwendung Diskussionsforum. Die drei Objekte Mitglied, Benutzer und Kommentar werden in relationalen Tabellen gespeichert und bekommen einen lokal gültigen Primärschlüssel. Aber anstatt eines Fremdschlüssels auf die entsprechende Beziehungstabelle halten diese eine global eindeutige Objektidentität vor welche in der Backing-Tabelle von OQGRAPH verwendet werden. Dieser Identifier wird durch eine separate Sequenz verwaltet, ein Index auf diesem ermöglicht des Weiteren schnelles Auffinden der Nutzdaten zu den von dem Graphalgohritmus gefundenen Ergebnissen. Die Relationen werden also als Kanten durch das OQGRAPH verwaltet, zu den eigentlichen Kanten (Start/Endknoten, Gewicht) wird auch Relationstyp gespeichert, so das bekannt ist welcher Ausprägung der Zielknoten hat und so die Nutzdaten direkt aus der entsprechenden Tabelle geladen werden können. Da die referenzierte Nutzdatentabelle über den Relationstyp aufgelöst werden muss, kann auch nicht durch die DB referentielle 
 Integrität gewährleistet werden.
 
-\begin{figure}
-	\caption{Logisches Schema der Beispielwendung: Diskussionsforum}
+\begin{figure}	
 	\centering
 	\includegraphics[width=0.9\textwidth]{images/logischesSchema.png}
+	\caption{Logisches Schema der Beispielwendung: Diskussionsforum}
 	\label{fig:logicSchema}
 \end{figure}
  
@@ -42,10 +42,10 @@ Als Service-Komponente bietet die mysqlConnect-Klasse den Service der Kommunikat
 
 Die mysqlConnect-Klasse beinhaltet alle Operationen bezüglich des CREATE, READ, UPDATE und DELETE (CRUD) in Bezug auf Mitglieder, Beiträge und Kommentare. Darüber hinaus besitzt die mysqlConnect-Klasse speziellere Leseoperationen, bspw. im Bezug auf die Kantenbeziehungen zwischen einzelnen Knoten. Für die Datenbereitstellung wurden jedoch keine Funktionen von OQGRAPH genutzt (siehe \ref{OQGRAPH-Client} \nameref{OQGRAPH-Client}).
 
-\begin{figure}
-	\caption{UML-Diagramm der Klasse \grqq mysqlConnect\grqq{} (erstellt mit PHPStorm)}
+\begin{figure}	
 	\centering
 	\includegraphics[width=0.6\textwidth]{images/mysqlConnect2.png}
+	\caption{UML-Diagramm der Klasse \grqq mysqlConnect\grqq{} (erstellt mit PHPStorm)}
 \end{figure}
 
 Die verschiedenen Knoten Mitglieder, Beiträge und Kommentare sind als Model-Klassen implementiert worden. Aus ihnen können Objekte generiert werden, die die jeweiligen Elemente, aber auch die Knoten darstellen. Für die Erstellung des Objektes wird die jeweilige Objekt-ID benötigt. Sollte nur die jeweilige Knoten-ID vorliegen, kann mittels des mysqlConnect-Adapters die zugehörige Objekt-ID ermittelt werden.
@@ -84,20 +84,20 @@ Zum anderen ist auch OQGRAPH in einer relationalen Datenbank \grqq gefangen\grqq
 
 Ein Beispiel aus den Testdaten verdeutlicht das Problem. Das Mitglied \grqq Oliver Higgins\grqq{} hat drei Beiträge verfasst, die insgesamt elf mal kommentiert wurden. Zwei Kommentare davon kommen vom Mitglied \grqq Leon Clemens\grqq{}. Dabei kommentierte Leon Clemens zwei Beiträge jeweils einmal.
 
-\begin{figure}
-	\caption{Graph zur Kommentiert-Von-Beziehung zwischen Oliver Higgins und Leon Clemens}
+\begin{figure}	
 	\centering
 	\includegraphics[width=0.6\textwidth]{images/graph.png}
+	\caption{Graph zur Kommentiert-Von-Beziehung zwischen Oliver Higgins und Leon Clemens}
 \end{figure}
 
 Für die Statistik \grqq Mitglied wurde von anderes Mitglied so oft kommentiert\grqq{} ist es wichtig die Anzahl der Wege zwischen Oliver Higgins und Leon Clemens zu zählen. Diese Funktionalität unterstützt OQGRAPH nicht \cite{OQGRAPH-Examples}. Es ist nur möglich zu ermitteln, welcher Pfad der kürzeste ist oder welche Knoten von welchem Knoten aus erreichbar sind.
 
-\begin{figure}
+\begin{figure}	
+	\centering
+	\includegraphics[width=0.7\textwidth]{images/oqgraph-select.png}
 	\caption{SQL-Select, wobei origid = 3 hier Oliver Higgins: \newline
 		\texttt{SELECT * FROM oq\_graph WHERE latch = 'breadth\_first'\newline AND origid = 3 AND weight < 4}
 	}
-	\centering
-	\includegraphics[width=0.7\textwidth]{images/oqgraph-select.png}
 \end{figure}
 
 Das Ergebnis der Breitensuche stellt uns die im Rahmen der Breitensuche erreichten Knoten dar. Anhand des Vorwissens, dass die origid ein Mitglied ist und in unserem Anwendungsbeispiel es nur Beziehungen der Art Mitglied-Zu-Beitrag, Beitrag-Zu-Kommentar und Kommentar-Zu-Beitrag gibt, können wir darauf schließen, dass die erreichten Knoten mit dem Gewicht (weight) Mitgliedsknoten sein müssen. Wenn jetzt noch eine weitere Beziehung, beispielsweise \grqq Kommentar-Zu-Kommentar\grqq{} hinzukommt, ist ein solcher Schluss nicht mehr möglich. In diesem Fall müsste nach den gefundenen Knoten-IDs nach Treffern in den jeweiligen Knoten-Tabellen gesucht werden.

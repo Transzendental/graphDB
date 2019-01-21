@@ -8,7 +8,7 @@ Für die Performanztests von MariaDB mit der OQGRAPH-Erweiterung wird der zur Ve
 
 Um die Datensätze voneinander zu abstrahieren und um die Performanztests voneinander unabhängig durchzuführen, wurde für jede Plattform jeweils eine Datenbank angelegt. In den fünf Datenbanken befinden sich jeweils zwei Tabellen.
 
-Die Tabelle \emph{profil} beinhaltet alle Profile aus den Datensätzen der jeweiligen Plattformen. Jede Zeile in der Tabelle stellt hierbei einen Knoten dar. Dabei stellt die Tabelle \emph{profil} noch weitere Informationen zum Knoten zur Verfügung, wie den Vor- und Nachnamen, sowie das Gender, das Geburtsdatum und das Land.
+Die Tabelle \emph{profil} beinhaltet alle Profile aus den Datensätzen der jeweiligen Plattformen. Jede Zeile in der Tabelle stellt hierbei einen Knoten dar. Dabei stellt die Tabelle \emph{profil} noch weitere Informationen zum Knoten zur Verfügung, wie den Vor- und Nachnamen, das Geschlecht, das Geburtsdatum und das Land. Das Land wurde noch indexiert, welches bei den Performance Messungen zur Anwendung kommt.
 
 In der Tabelle \emph{oq\_backing} werden die Kantenbeziehungen zwischen den einzelnen Knoten gespeichert. Dabei folgt die Tabelle der Namenskonvention der OQGRAPH-Erweiterung. Die Spalte \emph{origid} referenziert hierbei auf den Ausgangsknoten, von dem eine gerichtete Kante zum Zielknoten ausgeht, welcher in \emph{destid} referenziert wird. Außerdem werden in den Spalten \emph{rtype} und \emph{date} weitere Informationen zur Kantenbeziehung gespeichert.
 
@@ -38,85 +38,104 @@ Die Mess-Vorgänge wurden in SQL-Prozeduren definiert. Diese Prozeduren überneh
 \subsection{Performance-Messung}
 
 \subsubsection{Projektion und Selektion}
+Da OQGRAPH lediglich die Traversierung von Knoten ermöglicht sind die in diesem Kapitel durchgeführten Leistungstests keine Evaluierung des Graphsystems sondern der darunterliegenden relationalen Datenbank. Ein Ansatz, den Zugriff nur über die Kantentabelle zu ermöglichen, um so einen Anbindung an OQGRAPH zu simulieren wurde verworfen. Da die Performance unnötig leiden würde, da die Datenknotentabelle in jedem Fall gejoined werden muss. Gleichzeitig gibt es auch keine Vorteile, da der Primary Key der Datentabelle mit dem Knotenwert in der Backingtabelle identisch ist. Des Weiteren könnten die Ergebnisse verfälscht werden, wenn ein Datensatz kein Bestandteil einer Beziehung ist, sprich es existiert keine Kante zu diesem Datensatz.
 
-Die Standardprozedur für die Projektion und Selektion ist wie folgt aufgebaut:
+Bei der Selektion anhand von Primärschlüsseln wurde eine Messung mit dem erstem (ID = 1) Datensatz durchgeführt. Es folgend weitere Messungen in tausender Schritten (ID + 1000) bis das Ende der Tabelle erreicht wird. So lässt sich sicherstellen das dass das Mittelmaß der Messungen auch realistisch ist.
 
+Folgende \lstinline{SELECT} Statements wurden ausgeführt:
 \begin{lstlisting}
-DROP PROCEDURE IF EXISTS analysis;
-CREATE PROCEDURE analysis ()
-	BEGIN
-	DECLARE c INT;
-	DECLARE t1 BIGINT;
-	DECLARE t2 BIGINT;
-	DECLARE td INT;
-	DECLARE x INT;
-	DECLARE i INT DEFAULT 0;
-	DECLARE a INT;
-	
-	DELETE FROM analysis;
-	SELECT count(*) INTO c FROM profil;
-	
-	WHILE (i < 5) DO
-		SET x = 1;
-		WHILE (x < c) DO
-			SELECT UNIX\_TIMESTAMP(CURTIME(6))*1000000 INTO t1;
-			
-			//Zu messende Operation
-			
-			SELECT UNIX\_TIMESTAMP(CURTIME(6))*1000000 INTO t2;
-			
-			SELECT t2-t1 INTO td;
-			
-			INSERT INTO analysis VALUES (CONCAT(i,x), td);
-							
-			SET x = x+1000;
-		END WHILE;
-			
-		SET i = i+1;
-	END WHILE;
-	
-	SELECT AVG(time) INTO a FROM analysis;
-	DELETE FROM analysis;
-	INSERT INTO analysis VALUES (0, a);
-END;
+-- Nur der Primaerschlussel
+SELECT id FROM profil WHERE id = x;
+-- Das Vollstaendige Profil
+SELECT * FROM profil WHERE id = x;
 \end{lstlisting}
+
+Abbildung \ref{fig:NutzerPk} zeigt die Ergebnisse auf den unterschiedlichen Datenbanken. Es lassen sich nur leichte Schwankungen bei den Messwerten feststellen. Die Größe der Datenbank ist daher eher unerheblich, tendenziell benötigen Selektion mit sämtlichem Attributen mehr Zeit, ist aber durchaus vernachlässigbar.
+\begin{figure}
+	\centering
+	\includegraphics[width=\textwidth]{images/NutzerPk.png}
+	\caption{Messergebnisse zur Selektion eines Nutzers anhand des Primärschlüssels}
+	\label{fig:NutzerPk}
+\end{figure}
+
+Bei der Selektion anhand eines Nichtprimärschlüssels offenbarten sich zwei Probleme. Da auf den selektierten Attributen kein \emph{Unique Constraint} definiert ist, benötigen große Datenbanken exponentiell länger für die selbe Anfrage, da ein kompletter Scan durchgeführt werden muss. Dementsprechend ist die Vergleichbarkeit nicht mehr gewährleistet. Dieses Problem ließ sich durch eine \lstinline{LIMIT 1} Klausel lösen.
+
+Problematisch war auch, dass sich im Gegensatz zum Primärschlüssel die Anzahl der Abfragen nur schwer begrenzen lässt, da sich nicht mit fest vorgegeben Parameter arbeiten lässt. Stattdessen liefert ein zuvor definierter Cursor, welcher \lstinline{DISTINCT} Werte des entsprechenden Attributs selektiert, die Parameter. Im Falle des indexierten Zugriff erübrigte sich das Problem von selbst, da die Anzahl der Länder in einem idealem Rahmen lagen. Bei dem nicht indexierten Zugriff wurde aber nach den Nachnamen gesucht, hier mussten die Parameter noch weiter eingeschränkt werden. Durch die Verwendung einer \lstinline{WHERE RAND()<=0.001} Klausel konnte der Parameterraum auf ein tausendstel reduziert werden.
+
+Bei der Selektion mittels Nichtschlüsselattributen wurden folgenden \lstinline{SELECT} Statements ausgeführt:
+\begin{lstlisting}
+-- Anhand eines indexierten Attributes
+SELECT * FROM profil WHERE country = v LIMIT 1;
+-- Anhand eines nicht-indexierten Attributes
+SELECT * FROM profil WHERE last = v LIMIT 1;
+\end{lstlisting}
+
+Abbildung \ref{fig:NutzerNPk} und Abbildung \ref{fig:NutzerNPkI} zeigt die Ergebnisse der nicht-indexierten und indexierten Selektion auf den unterschiedlichen Datenbanken. Es ist zu erkennen das bei einer Selektion die Performanz von sehr großen Datenbank stark leidet. Auch bei einem indexierten Zugriff nimmt die Performanz mit steigender Datenmenge ab, die benötigte Zeit ist aber dennoch wesentlich geringer.
+\begin{figure}
+	\centering
+	\includegraphics[width=\textwidth]{images/NutzerNPk.png}
+	\caption{Messergebnisse zur Selektion eines Nutzers anhand eines nicht-Primärschlüssels}
+	\label{fig:NutzerNPk}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\includegraphics[width=\textwidth]{images/NutzerNPkI.png}
+	\caption{Messergebnisse zur Selektion eines Nutzers anhand eines nicht-Primärschlüssels}
+	\label{fig:NutzerNPkI}
+\end{figure}
+
 
 \subsubsection{Aggregation}
+Aus dem selben Grund wie bei Selektion und Projektion wurden auch bei diesen Tests ledigliche die relationalen SQL Datentabellen betrachtet.
 
-Die Standardprozedur für die Projektion und Selektion ist wie folgt aufgebaut:
+Folgende Tests wurden durchgeführt:
+\begin{enumerate}
+	\item Anzahl aller Nutzer - Abbildung \ref{fig:AnzahlNutzer}
+	\item Anzahl aller Beziehungen zwischen Nutzern - Abbildung \ref{fig:AnzahlBeziehung}
+	\item Durchschnittliche Alters aller Nutzer - Abbildung \ref{fig:DurschAlter}
+	\item Durchschnittliche Dauer aller Beziehung - Abbildung \ref{fig:DurschBeziehung}
+\end{enumerate}
 
+Folgende SQL Statements wurden durchgeführt:
 \begin{lstlisting}
-DROP PROCEDURE IF EXISTS analysis;
-CREATE PROCEDURE analysis ()
-	BEGIN
-	DECLARE c INT;
-	DECLARE t1 BIGINT;
-	DECLARE t2 BIGINT;
-	DECLARE td INT;
-	DECLARE i INT DEFAULT 0;
-	DECLARE a INT;
-		
-	DELETE FROM analysis;
-	SELECT count(*) INTO c FROM profil;
-		
-	WHILE (i < 100) DO
-		SELECT UNIX\_TIMESTAMP(CURTIME(6))*1000000 INTO t1;
-		
-		//Zu messende Operation
-		
-		SELECT UNIX\_TIMESTAMP(CURTIME(6))*1000000 INTO t2;
-		
-		SELECT t2-t1 INTO td;
-		
-		INSERT INTO analysis VALUES (i, td);
-		
-		SET i = i+1;
-	END WHILE;
-	
-	SELECT AVG(time) INTO a FROM analysis;
-	DELETE FROM analysis;
-	INSERT INTO analysis VALUES (0, a);
-END;
+-- Anzahl Nutzer
+SELECT COUNT(id) FROM profil;
+-- Anzahl Beziehungen
+SELECT COUNT(*) FROM oq_backing;
+-- Durchschnittsalter
+SELECT AVG(YEAR(NOW()) - YEAR(birth)) FROM profil;
+-- Durchscnittsdauer Beziehungen
+SELECT AVG(DATEDIFF(CURRENT_DATE, date)) FROM oq_backing;
 \end{lstlisting}
 
+Die Ergebnisse sind wenig überraschend, so steigt mit wachsender Datenmenge auch die benötigte Zeit. Je komplexer die Berechnung desto steiler der Anstieg.
+
+\begin{figure}
+	\centering
+	\includegraphics[width=\textwidth]{images/AnzahlNutzer.png}
+	\caption{Messergebnisse zur Zählung sämtlicher Nutzeraccounts}
+	\label{fig:AnzahlNutzer}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\includegraphics[width=\textwidth]{images/AnzahlBeziehung.png}
+	\caption{Messergebnisse zur Zählung bestehender Beziehungen}
+	\label{fig:AnzahlBeziehung}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\includegraphics[width=\textwidth]{images/DurschAlter.png}
+	\caption{Messergebnisse zur Berechnung des Durchschnittsalter}
+	\label{fig:DurschAlter}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\includegraphics[width=\textwidth]{images/DurschBeziehung.png}
+	\caption{Messergebnisse zur Berechnung der Dauer eine durchschnittlichen Beziehung}
+	\label{fig:DurschBeziehung}
+\end{figure}
 \subsubsection{Traversierung}
