@@ -36,3 +36,23 @@ origid='origid'
 destid='destid' 
 weight='weight';	
 \end{lstlisting}
+\section{Installationsscript der OLTP Anwendung}
+\lstset{
+	columns=fullflexible,
+	breaklines=true,
+	postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space},
+}
+\lstinputlisting[language=SQL]{appendix/oltp_create.log}
+\section{Messergebnisse des OLAP Systems}
+\begin{tabularx}{\textwidth}{X X X X X X}
+	\textbf{Test Case}    & \textbf{Facebook}  & \textbf{Wikipedia} & \textbf{Epinions} & \textbf{Youtube} & \textbf{LiveJournal} \\
+	\hline
+	Selektion PK &	39&	35&	35&	48&	38\\
+	PK (Vollständig)&	45&	40&	34&	49&	39\\
+	NPK&	1198&	1631&	2762&	34353&	53051\\
+	indexierter NPK&	151&	339&	61&	148&	160\\
+	Anz. Nutzer&	1180&	2438&	10279&	313073&	1080732\\
+	Anz. Beziehungen&	24333&	28018&	46188&	819052&	9255936\\
+	AVG Alter&	3226&	4564&	18562&	508547&	1904271\\
+	AVG Beziehung&	37821&	47658&	85494&	1444649&	16644672\\
+\end{tabularx}
