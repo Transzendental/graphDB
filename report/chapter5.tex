@@ -1,5 +1,5 @@
+\section{MariaDB mit OQGRAPH}%Fazit
 \subsection{Zusammenfassung}
-
 OQGRAPH ist eine Erweiterung von MariaDB, die sich sehr leicht installieren lässt. Es erweitert die relationale Datenbank und SQL um spezielle Abfragen im Bezug auf Graphen. Es nutzt und erzeugt selbst relationale Datenstrukturen. Die Traversierung ist dabei auch in hohen Rekursionsstufen sehr schnell und zuverlässig. Jedoch ist eine Unterteilung von Knoten und Kanten in bestimmte Typen nur über reguläre SQL-Abfragen möglich, auf die OQGRAPH aufsetzt. So steigt die Komplexität um die Nutzung von OQGRAPH.
 
 Die Erweiterung OQGRAPH eignet sich daher noch für Anwendungsfälle, in denen Knoten und Kanten nicht in ihren Typen unterschieden werden oder bereits gefiltert wurden. In solchen Anwendungsfällen kann OQGRAPH die Komplexität reduzieren, da mittels der Traversierung hier keine komplexen SQL-JOIN-Verflechtungen mehr notwendig sind. In den Anwendungsfällen, in denen Knoten und Kanten in ihren Typen unterschieden werden, ist eine entsprechende Vorverarbeitung notwendig. Eine Selektion von Knoten in einer Kette von speziellen Typen, wie im Beispiel des Gästebuches, ist nur unter sehr hohem Aufwand oder mittels fehleranfälliger Workarounds möglich.
