@@ -143,7 +143,8 @@ Die Ergebnisse sind wenig überraschend, so steigt mit wachsender Datenmenge auc
 \newpage
 
 \subsubsection{Traversierung}
-Für die Traversierung wird OQGRAPH-Engine verwendet, aber zuerst für Benutzung der OQGRAPH werden spezialle Vorbereitungstabellen erstellt, bei dessen Aufbau nur die relationalen Befehlen durchgeführt wurden.
+Für die Traversierung wird OQGRAPH-Engine verwendet, aber durch OQGRAPH ist keine Selektion der Knoten und Kanten möglich. Um die OQGRAPH Tabelle zu erstellen, muss man zuerst eine "backing" Tabelle erstellen. Diese "backing" Tabelle speichert die tatsächlichen Daten und wird für alle INSERTS, UPDATES usw. verwendet. Dies sollte eine reguläre Tabelle sein, keine View, und beim Aufbau der "backing" Tabellen werden nur die relationalen Befehlen durchgeführt. 
+In unserem Fall werden am Anfang die "backing" Tabelle für jede Datebanken erstellt, und dann wird schon mit der Benutzung OQGRAPH-Engine in diesen Tabellen die Traversierung durchgeführt werden.
 
 Folgende Tests wurden durchgeführt:
 \begin{enumerate}
