@@ -112,35 +112,35 @@ SELECT AVG(DATEDIFF(CURRENT_DATE, date)) FROM oq_backing;
 
 Die Ergebnisse sind wenig überraschend, so steigt mit wachsender Datenmenge auch die benötigte Zeit. Je komplexer die Berechnung desto steiler der Anstieg. Da diese Operationen auf einer relationalen Tabelle ausgeführt wurden, machen sich auch die Vorteile eines solchen Models bemerkbar. Es ist davon auszugehen das spaltenweise SQL Aggregation wesentlich performanter ist, da nicht erst die Knoten geladen und deren Attribute extrahiert werden müssen.
 
-\begin{figure}
+\begin{figure}[h!]
 	\centering
 	\includegraphics[width=\textwidth]{images/AnzahlNutzer.png}
 	\caption{Messergebnisse zur Zählung sämtlicher Nutzeraccounts}
 	\label{fig:AnzahlNutzer}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[h!]
 	\centering
 	\includegraphics[width=\textwidth]{images/AnzahlBeziehung.png}
 	\caption{Messergebnisse zur Zählung bestehender Beziehungen}
 	\label{fig:AnzahlBeziehung}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[h!]
 	\centering
 	\includegraphics[width=\textwidth]{images/DurschAlter.png}
 	\caption{Messergebnisse zur Berechnung des Durchschnittsalter}
 	\label{fig:DurschAlter}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[h!]
 	\centering
 	\includegraphics[width=\textwidth]{images/DurschBeziehung.png}
 	\caption{Messergebnisse zur Berechnung der Dauer eine durchschnittlichen Beziehung}
 	\label{fig:DurschBeziehung}
 \end{figure}
 
-\newpage
+\phantom{Platzhalter wegen verwirrender Figure-Platzierung}
 
 \subsubsection{Traversierung}
 Für die Traversierung wird OQGRAPH-Engine verwendet, aber durch OQGRAPH ist keine Selektion der Knoten und Kanten möglich. Um die OQGRAPH Tabelle zu erstellen, muss man zuerst eine "backing" Tabelle erstellen. Diese "backing" Tabelle speichert die tatsächlichen Daten und wird für alle INSERTS, UPDATES usw. verwendet. Dies sollte eine reguläre Tabelle sein, keine View, und beim Aufbau der "backing" Tabellen werden nur die relationalen Befehlen durchgeführt. 
