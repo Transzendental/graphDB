@@ -107,10 +107,10 @@ keepaspectratio]{images/Logo_H-BRS_background}%
 % input the title
 \input{Titelblatt}
 
-\input{Zusammenfassung}
+\input{z.1}
 
 % load the preamble
-\input{Vorwort}
+\input{p.1}
 
 % loads the fancy pagestyle for register part
 \input{fancyRegisterPart}
@@ -129,28 +129,33 @@ keepaspectratio]{images/Logo_H-BRS_background}%
 % #####
 % # load the chapter from the files
 % #####
+\setcounter{chapter}{0}
+\setcounter{section}{0}
+\chapter{Graph-Datenbanken - Grundlegende technologische Aspekte}
+\input{1.1.1}
+
+\newpage
 \setcounter{chapter}{1}
 \setcounter{section}{0}
-\input{1.1.1}
+\chapter{Graph-Datenbanken und -Frameworks - Ausgewählte Systeme}
+\input{2.1.1}
 
 \newpage
 \setcounter{chapter}{2}
 \setcounter{section}{0}
-\input{2.1.1}
+\chapter{Graph-Datenbanken im praktischen Einsatz: OLTP}
+\input{3.1.1}
 
 \newpage
 \setcounter{chapter}{3}
 \setcounter{section}{0}
-\input{3.1.1}
+\chapter{Graph-Datenbanken im praktischen Einsatz: OLAP}
+\input{4.1.1}
 
 \newpage
 \setcounter{chapter}{4}
 \setcounter{section}{0}
-\input{4.1.1}
-
-\newpage
-\setcounter{chapter}{5}
-\setcounter{section}{0}
+\chapter{Fazit}
 \input{5.1.1}
 
 \newpage
@@ -161,7 +166,7 @@ keepaspectratio]{images/Logo_H-BRS_background}%
 % #####
 % # load the appendix from the files
 % #####
-\input{Anhang}
+\input{a.1}
 
 % #####
 % # list of table, list of figures, and list of listings in ToC
@@ -188,11 +193,11 @@ keepaspectratio]{images/Logo_H-BRS_background}%
 % #####
 % # load the bibliography
 % #####
-\bibliography{bibliography}
+\bibliography{b.1}
 
 % #####
 % # load the sworn declaration
 % #####
-\input{Erklaerung}
+\input{d.1}
 % end of the document
 \end{document}
