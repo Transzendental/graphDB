@@ -105,12 +105,12 @@ keepaspectratio]{images/Logo_H-BRS_background}%
 % set pagenumbering to roman(I II III IV)
 \pagenumbering{Roman}
 % input the title
-\input{title}
+\input{Titelblatt}
 
-\input{abstract}
+\input{Zusammenfassung}
 
 % load the preamble
-\input{preamble}
+\input{Vorwort}
 
 % loads the fancy pagestyle for register part
 \input{fancyRegisterPart}
@@ -131,27 +131,27 @@ keepaspectratio]{images/Logo_H-BRS_background}%
 % #####
 \setcounter{chapter}{1}
 \setcounter{section}{0}
-\input{chapter1}
+\input{1.1.1}
 
 \newpage
 \setcounter{chapter}{2}
 \setcounter{section}{0}
-\input{chapter2}
+\input{2.1.1}
 
 \newpage
 \setcounter{chapter}{3}
 \setcounter{section}{0}
-\input{chapter3}
+\input{3.1.1}
 
 \newpage
 \setcounter{chapter}{4}
 \setcounter{section}{0}
-\input{chapter4}
+\input{4.1.1}
 
 \newpage
 \setcounter{chapter}{5}
 \setcounter{section}{0}
-\input{chapter5}
+\input{5.1.1}
 
 \newpage
 
@@ -161,7 +161,7 @@ keepaspectratio]{images/Logo_H-BRS_background}%
 % #####
 % # load the appendix from the files
 % #####
-\input{appendix}
+\input{Anhang}
 
 % #####
 % # list of table, list of figures, and list of listings in ToC
@@ -182,8 +182,7 @@ keepaspectratio]{images/Logo_H-BRS_background}%
 \phantomsection 
 \addcontentsline{toc}{chapter}{Abkürzungsverzeichnis}
 \renewcommand\refname{Abkürzungsverzeichnis} 
-\chapter*{Abkürzungsverzeichnis}
-\input{abbreviations}
+\input{Abkuerzungsverzeichnis}
 \newpage
 
 % #####
@@ -194,6 +193,6 @@ keepaspectratio]{images/Logo_H-BRS_background}%
 % #####
 % # load the sworn declaration
 % #####
-%\input{declaration}
+\input{Erklaerung}
 % end of the document
 \end{document}
