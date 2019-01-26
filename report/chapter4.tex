@@ -142,7 +142,140 @@ Die Ergebnisse sind wenig überraschend, so steigt mit wachsender Datenmenge auc
 \newpage
 
 \subsubsection{Traversierung}
-TEXTEXTTEXT
+Für die Traversierung wird OQGRAPH-Engine verwendet, aber zuerst für Benutzung der OQGRAPH werden spezialle Vorbereitungstabellen erstellt, bei dessen Aufbau nur die relationalen Befehlen durchgeführt wurden.
+
+Folgende Tests wurden durchgeführt:
+\begin{enumerate}
+	\item Erstellung der OQGRAPH Tabellen \ref{fig:facevor}
+	\ref{fig:wikivor}
+	\ref{fig:epinvor}
+	\ref{fig:youtubvor}
+	\ref{fig:LiJouvor}
+	\item Transitive Suche in Facebook
+	\ref{fig:face}
+	\item Transitive Suche in Wikipedia
+	\ref{fig:wiki}
+	\item Transitive Suche in Epinions 
+	\ref{fig:epin}
+	\item Transitive Suche in Youtube 
+	\ref{fig:youtub}
+	\item Transitive Suche in LiveJournal 
+	\ref{fig:LiJou}
+\end{enumerate}
+
+
+Folgende SQL Statements (nur die wichtige SQL Befehlen) wurden durchgeführt:
+\begin{lstlisting}
+-- Vorbereitung Tabelle der Business Kontakten
+SELECT * FROM oq_backing WHERE rtype = "BUSINE";
+
+-- Vorbereitung Tabelle der auslaendischen Kontakten
+SET @land = 'BE';
+SELECT DISTINCT * FROM 
+(SELECT b1.origid, b1.destid FROM oq_backing b1 INNER JOIN
+ profil p1 ON b1.destid = p1.id WHERE p1.country <> @land
+UNION
+SELECT b2.origid, b2.destid FROM oq_backing b2 INNER JOIN
+ profil p2 ON b2.origid = p2.id WHERE p2.country <> @land
+UNION
+SELECT b3.origid, b3.destid FROM oq_backing b3 INNER JOIN
+ profil p3 ON b3.origid = p3.id WHERE p3.id = sID
+UNION
+SELECT b4.origid, b4.destid FROM oq_backing b4 INNER JOIN
+ profil p4 ON b4.destid = p4.id WHERE p4.id = sID);
+ 
+-- Suche nach Kontakten
+SELECT * FROM oq_graph WHERE latch='breadth_first' AND
+ origid="start ID Knote" AND weight <= "Tiefe gerichtet" AND
+  weight>0;
+  
+-- Suche nach Business Kontakten
+SELECT * FROM oq_graph_business WHERE latch='breadth_first'
+ AND origid="start ID Knote" AND weight <= "Tiefe gerichtet"
+  AND weight>0;
+  
+-- Suche nach auslaendischen Kontakten
+SELECT * FROM oq_graph_ausland WHERE latch='breadth_first'
+ AND origid="start ID Knote" AND weight <= "Tiefe gerichtet"
+  AND weight>0;
+\end{lstlisting}
+
+
+\begin{figure}
+	\centering
+	\includegraphics[width=\textwidth]{images/facevor.jpg}
+	\caption{Messergebnisse zur Vorbereitung OQGRAPH Tabelle Facebook}
+	\label{fig:facevor}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\includegraphics[width=\textwidth]{images/wikivor.jpg}
+	\caption{Messergebnisse zur Vorbereitung OQGRAPH Tabelle Wikipedia}
+	\label{fig:wikivor}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\includegraphics[width=\textwidth]{images/epinvor.jpg}
+	\caption{Messergebnisse zur Vorbereitung OQGRAPH Tabelle Epinions}
+	\label{fig:epinvor}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\includegraphics[width=\textwidth]{images/youtubvor.jpg}
+	\caption{Messergebnisse zur Vorbereitung OQGRAPH Tabelle YouTube}
+	\label{fig:youtubvor}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\includegraphics[width=\textwidth]{images/LiJouvor.jpg}
+	\caption{Messergebnisse zur Vorbereitung OQGRAPH Tabelle LiveJournal}
+	\label{fig:LiJouvor}
+\end{figure}
+
+Die Ergebnisse sind ganz erwarten, dass je größer die Datebanken sind, desto mehr die Zeit wird für die Erstellung der Tabellen benötigt und im Fall der QOGRAPH ausländischen Tabellen im LiveJournall ist Aufwand wegen mehreren JOIN Befehelen wirklich zu groß um die Ergebnisse zu berechnen.
+Auch geht es um die kleine Daten im Tabelle "Facebook", darum kann die Tabelle manchmal  für die geschäftlichen Kontakten ein bisschen schneller erstellt werden.  
+
+
+\begin{figure}
+	\centering
+	\includegraphics[width=\textwidth]{images/face.jpg}
+	\caption{Messergebnisse nach Tiefenstufen in Tabelle Facebook}
+	\label{fig:face}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[width=\textwidth]{images/wiki.jpg}
+\caption{Messergebnisse nach Tiefenstufen in Tabelle Wikipedia}
+\label{fig:wiki}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\includegraphics[width=\textwidth]{images/epin.jpg}
+	\caption{Messergebnisse nach Tiefenstufen in Tabelle Epinions}
+	\label{fig:epin}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\includegraphics[width=\textwidth]{images/youtub.jpg}
+	\caption{Messergebnisse nach Tiefenstufen in Tabelle YouTube}
+	\label{fig:youtub}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\includegraphics[width=\textwidth]{images/LiJou.jpg}
+	\caption{Messergebnisse nach Tiefenstufen in Tabelle LiveJournal}
+	\label{fig:LiJou}
+\end{figure}
+
+Allgemeine kann man feststellen, dass die Bearbeitungszeit für jede Transitive Suche vom Tiefstufen unabhängig ist. Manchmal ist bei einigen Suchen die Bearbeitungszeit groß,  z.B als auf dem Diagramm der Epinions im Tiefestufe 5, aber manchmal ist es auch in der Tiefestufe 1 auch, als in Youtube, darum hängt die Bearbeitungszeit von etwas Anderes als Tiefstufen ab. Und trotz vielen Zahlen der Knoten im Livejournal bleibt diese Tendenz fast gleich.
 
 \subsection{Fazit}
 Ebenso wie bei der OLTP Anwendung erfordert der begrenzte Funktionsumfang von OQGRAPH ein Ausweichen auf relationales SQL. Lediglich bei der Traversierung von Knoten kamen Funktionalitäten von OQGRAPH zum Einsatz, allerdings musste auch hier mit Workarounds gearbeitet werden um die Limitierung der homogenen Kanten zu umgehen. Die Performance selbst kann dabei mit konkurrierenden Graphdatenbanken mithalten. Positiv bemerkbar hat sich das koexistierende relationale Datenmodel hingegen bei der Aggregation gemacht, hier kamen die Vorteile von SQL zum Einsatz.
