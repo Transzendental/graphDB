@@ -109,7 +109,7 @@ SELECT AVG(YEAR(NOW()) - YEAR(birth)) FROM profil;
 SELECT AVG(DATEDIFF(CURRENT_DATE, date)) FROM oq_backing;
 \end{lstlisting}
 
-Die Ergebnisse sind wenig überraschend, so steigt mit wachsender Datenmenge auch die benötigte Zeit. Je komplexer die Berechnung desto steiler der Anstieg.
+Die Ergebnisse sind wenig überraschend, so steigt mit wachsender Datenmenge auch die benötigte Zeit. Je komplexer die Berechnung desto steiler der Anstieg. Da diese Operationen auf einer relationalen Tabelle ausgeführt wurden, machen sich auch die Vorteile eines solchen Models bemerkbar. Es ist davon auszugehen das spaltenweise SQL Aggregation wesentlich performanter ist, da nicht erst die Knoten geladen und deren Attribute extrahiert werden müssen.
 
 \begin{figure}
 	\centering
@@ -143,3 +143,6 @@ Die Ergebnisse sind wenig überraschend, so steigt mit wachsender Datenmenge auc
 
 \subsubsection{Traversierung}
 TEXTEXTTEXT
+
+\subsection{Fazit}
+Ebenso wie bei der OLTP Anwendung erfordert der begrenzte Funktionsumfang von OQGRAPH ein Ausweichen auf relationales SQL. Lediglich bei der Traversierung von Knoten kamen Funktionalitäten von OQGRAPH zum Einsatz, allerdings musste auch hier mit Workarounds gearbeitet werden um die Limitierung der homogenen Kanten zu umgehen. Die Performance selbst kann dabei mit konkurrierenden Graphdatenbanken mithalten. Positiv bemerkbar hat sich das koexistierende relationale Datenmodel hingegen bei der Aggregation gemacht, hier kamen die Vorteile von SQL zum Einsatz.
