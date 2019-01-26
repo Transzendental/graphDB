@@ -1,6 +1,6 @@
 In diesem Kapitel wird beschrieben wie das semantische Schema einer typische OLTP-Anwendung, also ein System welches traditionell mit relationalen Datenbanken arbeitet, in ein Graph-Schema von MariaDBs OQGRAPH überführt werden kann. Als Beispiel dient ein Diskussionsforum, in dem Mitglieder Beiträge verfassen und kommentieren können. Abbildung \ref{fig:semanticSchema} zeigt das semantische Schema des Forums. In den folgenden Abschnitten wird das ensprechnde Datenbankschema konzipiert, sowie diverse typische Usecases für ein solches Forum erläutert und implementiert. Die Verwendung dieser Usecases erfolgt über einem entferntem PHP-Client, welcher ebenfalls kurz vorgestellt wird.
 
-\begin{figure}
+\begin{figure}[h]
 	\centering
 	\includegraphics[width=0.6\textwidth]{images/semantischesSchema.png}	
 	\caption{Semantisches Schema der Beispielwendung: Diskussionsforum}
@@ -84,7 +84,7 @@ Zum anderen ist auch OQGRAPH in einer relationalen Datenbank \grqq gefangen\grqq
 
 Ein Beispiel aus den Testdaten verdeutlicht das Problem. Das Mitglied \grqq Oliver Higgins\grqq{} hat drei Beiträge verfasst, die insgesamt elf mal kommentiert wurden. Zwei Kommentare davon kommen vom Mitglied \grqq Leon Clemens\grqq{}. Dabei kommentierte Leon Clemens zwei Beiträge jeweils einmal.
 
-\begin{figure}	
+\begin{figure}[h]
 	\centering
 	\includegraphics[width=0.6\textwidth]{images/graph.png}
 	\caption{Graph zur Kommentiert-Von-Beziehung zwischen Oliver Higgins und Leon Clemens}
@@ -92,7 +92,7 @@ Ein Beispiel aus den Testdaten verdeutlicht das Problem. Das Mitglied \grqq Oliv
 
 Für die Statistik \grqq Mitglied wurde von anderes Mitglied so oft kommentiert\grqq{} ist es wichtig die Anzahl der Wege zwischen Oliver Higgins und Leon Clemens zu zählen. Diese Funktionalität unterstützt OQGRAPH nicht \cite{OQGRAPH-Examples}. Es ist nur möglich zu ermitteln, welcher Pfad der kürzeste ist oder welche Knoten von welchem Knoten aus erreichbar sind.
 
-\begin{figure}	
+\begin{figure}[h]
 	\centering
 	\includegraphics[width=0.7\textwidth]{images/oqgraph-select.png}
 	\caption{SQL-Select, wobei origid = 3 hier Oliver Higgins: \newline

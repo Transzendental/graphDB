@@ -51,7 +51,7 @@ SELECT * FROM profil WHERE id = x;
 \end{lstlisting}
 
 Abbildung \ref{fig:NutzerPk} zeigt die Ergebnisse auf den unterschiedlichen Datenbanken. Es lassen sich nur leichte Schwankungen bei den Messwerten feststellen. Die Größe der Datenbank ist daher eher unerheblich, tendenziell benötigen Selektion mit sämtlichem Attributen mehr Zeit, ist aber durchaus vernachlässigbar.
-\begin{figure}
+\begin{figure}[h]
 	\centering
 	\includegraphics[width=\textwidth]{images/NutzerPk.png}
 	\caption{Messergebnisse zur Selektion eines Nutzers anhand des Primärschlüssels}
@@ -71,14 +71,14 @@ SELECT * FROM profil WHERE last = v LIMIT 1;
 \end{lstlisting}
 
 Abbildung \ref{fig:NutzerNPk} und Abbildung \ref{fig:NutzerNPkI} zeigt die Ergebnisse der nicht-indexierten und indexierten Selektion auf den unterschiedlichen Datenbanken. Es ist zu erkennen das bei einer Selektion die Performanz von sehr großen Datenbank stark leidet. Auch bei einem indexierten Zugriff nimmt die Performanz mit steigender Datenmenge ab, die benötigte Zeit ist aber dennoch wesentlich geringer.
-\begin{figure}
+\begin{figure}[h]
 	\centering
 	\includegraphics[width=\textwidth]{images/NutzerNPk.png}
 	\caption{Messergebnisse zur Selektion eines Nutzers anhand eines Nicht-Primärschlüssels}
 	\label{fig:NutzerNPk}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[h]
 	\centering
 	\includegraphics[width=\textwidth]{images/NutzerNPkI.png}
 	\caption{Messergebnisse zur Selektion eines Nutzers anhand eines Nicht-Primärschlüssels}
