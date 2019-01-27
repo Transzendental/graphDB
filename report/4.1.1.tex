@@ -15,7 +15,7 @@ In der Tabelle \emph{oq\_backing} werden die Kantenbeziehungen zwischen den einz
 
 Für den Import der Zeilen aus den CSV-Datensätzen in die Datenbank wurde die Datenbank-IDE DataGrip genutzt. Beim CSV-Import wandelt die DataGrip-IDE die CSV-Datei in mehrere Insert-SQL-Statements um und führt diese Statements in der ausgewählten Datenbank aus. So wurden schließlich alle Zeilen aus den CSV-Dateien in die Datenbank importiert.
 
-Die Anzahl der Zeilen in den Tabellen der verschiedenen Datenbanken kann der folgenden Auflistung entnommen werden.
+Die Anzahl der Datensätze pro Tabelle auf den entsprechenden Datenbanken kann der folgenden Auflistung entnommen werden.
 
 \begin{center}
 	\begin{tabular}{l|l l l l l }
@@ -30,16 +30,16 @@ Die Anzahl der Zeilen in den Tabellen der verschiedenen Datenbanken kann der fol
 
 Im Rahmen des Performanztests wird die Dauer einer einzelnen Operation als Metrik herangezogen. Hierbei wird die Zeit gemessen, die eine Operation in Form eines SQL-Statements benötigt. Hierbei kann es aber auch zu ausreißenden Beobachtungen kommen. Ausreißer können entstehen, weil das MariaDB-Datenbanksystem eine SQL-Abfrage nicht immer gleich und deshalb diese nicht immer über eine konstant gleichbleibende Dauer ausführt.
 
-Es ist daher wichtig den Einfluss von Ausreißern möglichst zu minimieren. Aus diesem Grund werden die Messungen mehrmals durchgeführt und anschließend der durchschnittliche Zeitbedarf berechnet. Je nach Zugriffsart finden weitere Messungen statt. So werden bei Projektionen und Selektionen unterschiedliche Stellen der Tabellen abgefragt, da Abfragen auf den Beginn oder das Ende der Tabelle die Messungen verfälschen würde.
+Es ist daher wichtig den Einfluss von Ausreißern möglichst zu minimieren. Aus diesem Grund werden die Messungen mehrmals durchgeführt und anschließend der durchschnittliche Zeitbedarf berechnet. Je nach Zugriffsart finden weitere Messungen statt. So werden bei Projektionen und Selektionen unterschiedliche Stellen der Tabellen abgefragt, da Abfragen auf den Beginn oder das Ende der Tabelle die Messungen verfälschen würden.
 
-Die Mess-Vorgänge wurden in SQL-Prozeduren definiert. Diese Prozeduren übernehmen die Zeitmessung, die Speicherung der Messwerte, sowie die Ermittlung des Durchschnittes. Die Messergebnisse werden dabei in einer weiteren Tabelle \emph{analysis} gespeichert, die auf jeder Datenbank erstellt wurde. Die Prozeduren werden dann mittels des \emph{CALL}-SQL-Befehls aufgerufen.
+Die Messvorgänge wurden in SQL-Prozeduren definiert. Diese Prozeduren übernehmen die Zeitmessung, die Speicherung der Messwerte, sowie die Ermittlung des Durchschnittes. Die Messergebnisse werden dabei in einer weiteren Tabelle \emph{analysis} gespeichert, die auf jeder Datenbank erstellt wurde. Die Prozeduren können dann mittels des \emph{CALL}-SQL-Befehls aufgerufen werden.
 
 \subsection{Performance-Messung}
 
 \subsubsection{Projektion und Selektion}
-Da OQGRAPH lediglich die Traversierung von Knoten ermöglicht sind die in diesem Kapitel durchgeführten Leistungstests keine Evaluierung des Graphsystems sondern der darunterliegenden relationalen Datenbank. Ein Ansatz, den Zugriff nur über die Kantentabelle zu ermöglichen, um so einen Anbindung an OQGRAPH zu simulieren wurde verworfen. Da die Performance unnötig leiden würde, da die Datenknotentabelle in jedem Fall gejoined werden muss. Gleichzeitig gibt es auch keine Vorteile, da der Primary Key der Datentabelle mit dem Knotenwert in der Backingtabelle identisch ist. Des Weiteren könnten die Ergebnisse verfälscht werden, wenn ein Datensatz kein Bestandteil einer Beziehung ist, sprich es existiert keine Kante zu diesem Datensatz.
+Da OQGRAPH lediglich die Traversierung von Knoten ermöglicht, sind die in diesem Kapitel durchgeführten Leistungstests keine Evaluierung des Graphsystems sondern der darunterliegenden relationalen Datenbank. Ein Ansatz, den Zugriff nur über die Kantentabelle zu ermöglichen, um so einen Anbindung an OQGRAPH zu simulieren wurde verworfen. Die Performance würde  nur unnötig leiden, da die Datenknotentabelle in jedem Fall gejoined werden muss. Gleichzeitig gibt es auch keine Vorteile, da der Primary Key der Datentabelle mit dem Knotenwert in der Backingtabelle identisch ist. Des Weiteren könnten die Ergebnisse verfälscht werden, wenn ein Datensatz kein Bestandteil einer Beziehung ist, sprich es existiert keine Kante zu diesem Datensatz.
 
-Bei der Selektion anhand von Primärschlüsseln wurde eine Messung mit dem erstem (ID = 1) Datensatz durchgeführt. Es folgend weitere Messungen in tausender Schritten (ID + 1000) bis das Ende der Tabelle erreicht wird. So lässt sich sicherstellen das dass das Mittelmaß der Messungen auch realistisch ist.
+Bei der Selektion anhand von Primärschlüsseln wurde eine Messung mit dem erstem (ID = 1) Datensatz durchgeführt. Es folgend weitere Messungen in tausender Schritten (ID + 1000) bis das Ende der Tabelle erreicht wird. So lässt sich sicherstellen, dass das Mittelmaß der Messungen auch realistisch ist.
 
 Folgende \lstinline{SELECT} Statements wurden ausgeführt:
 \begin{lstlisting}
@@ -57,9 +57,9 @@ Abbildung \ref{fig:NutzerPk} zeigt die Ergebnisse auf den unterschiedlichen Date
 	\label{fig:NutzerPk}
 \end{figure}
 
-Bei der Selektion anhand eines Nichtprimärschlüssels offenbarten sich zwei Probleme. Da auf den selektierten Attributen kein \emph{Unique Constraint} definiert ist, benötigen große Datenbanken exponentiell länger für die selbe Anfrage, da ein kompletter Scan durchgeführt werden muss. Dementsprechend ist die Vergleichbarkeit nicht mehr gewährleistet. Dieses Problem ließ sich durch eine \lstinline{LIMIT 1} Klausel lösen.
+Bei der Selektion anhand eines Nichtprimärschlüssels offenbarten sich zwei Probleme. Da auf den selektierten Attributen kein \emph{Unique Constraint} definiert ist, benötigen große Datenbanken exponentiell länger für die selbe Anfrage, da ein kompletter Scan durchgeführt werden muss. Dementsprechend ist die Vergleichbarkeit nicht mehr gewährleistet. Dieses Problem ließ sich durch eine \lstinline{LIMIT 1} Klausel lösen. Zahlreiche Duplikate sorgen allerdings dafür das relativ zeitig ein Match gefunden wird. Die Ergebnisse sind also besser als zu vermuten wären, unter der Annahme dass in der Praxis sämtliche Matches gefunden werden müssten.
 
-Problematisch war auch, dass sich im Gegensatz zum Primärschlüssel die Anzahl der Abfragen nur schwer begrenzen lässt, da sich nicht mit fest vorgegeben Parameter arbeiten lässt. Stattdessen liefert ein zuvor definierter Cursor, welcher \lstinline{DISTINCT} Werte des entsprechenden Attributs selektiert, die Parameter. Im Falle des indexierten Zugriff erübrigte sich das Problem von selbst, da die Anzahl der Länder in einem idealem Rahmen lagen. Bei dem nicht indexierten Zugriff wurde aber nach den Nachnamen gesucht, hier mussten die Parameter noch weiter eingeschränkt werden. Durch die Verwendung einer \lstinline{WHERE RAND()<=0.001} Klausel konnte der Parameterraum auf ein tausendstel reduziert werden.
+Problematisch war auch, dass sich im Gegensatz zum Primärschlüssel die Anzahl der Abfragen nur schwer begrenzen lässt, da sich nicht mit fest vorgegeben Parameter arbeiten lässt. Stattdessen liefert ein zuvor definierter Cursor, welcher \lstinline{DISTINCT} Werte des entsprechenden Attributs selektiert, die Parameter. Im Falle des indexierten Zugriff erübrigte sich das Problem von selbst, da die Anzahl der Länder in einem idealem Rahmen lagen. Bei dem nicht indexierten Zugriff wurde aber nach den Nachnamen gesucht, hier mussten die Parameter noch weiter eingeschränkt werden. Durch die Verwendung einer \lstinline{WHERE RAND()<=0.001} Klausel konnte der Parameterraum auf ein Tausendstel reduziert werden.
 
 Bei der Selektion mittels Nichtschlüsselattributen wurden folgenden \lstinline{SELECT} Statements ausgeführt:
 \begin{lstlisting}
@@ -69,7 +69,7 @@ SELECT * FROM profil WHERE country = v LIMIT 1;
 SELECT * FROM profil WHERE last = v LIMIT 1;
 \end{lstlisting}
 
-Abbildung \ref{fig:NutzerNPk} und Abbildung \ref{fig:NutzerNPkI} zeigt die Ergebnisse der nicht-indexierten und indexierten Selektion auf den unterschiedlichen Datenbanken. Es ist zu erkennen das bei einer Selektion die Performanz von sehr großen Datenbank stark leidet. Auch bei einem indexierten Zugriff nimmt die Performanz mit steigender Datenmenge ab, die benötigte Zeit ist aber dennoch wesentlich geringer.
+Abbildung \ref{fig:NutzerNPk} und Abbildung \ref{fig:NutzerNPkI} zeigt die Ergebnisse der nicht-indexierten und indexierten Selektion auf den unterschiedlichen Datenbanken. Es ist zu erkennen das bei einer Selektion die Performanz von sehr großen Datenbank stark leidet. Hilfreich ist ein Index dieser sorgt dafür, dass auch bei steigender Datenmengen die Abfragedauer akzeptabel bleibt. Ganz so schnell wie bei einer Selektion über der Primärschlüssel sind die Abfragen allerdings nicht.
 \begin{figure}[h]
 	\centering
 	\includegraphics[width=\textwidth]{images/NutzerNPk.png}
@@ -141,7 +141,7 @@ Die Ergebnisse sind wenig überraschend, so steigt mit wachsender Datenmenge auc
 \phantom{Platzhalter wegen verwirrender Figure-Platzierung}
 
 \subsubsection{Traversierung}
-Für die Traversierung werden Funktionen der OQGRAPH-Engine verwendet. Da durch OQGRAPH keine Selektion der Kanten und Knoten über ihre Typen möglich ist, müssen zunächst die selektierten Kanten und Knoten in einer temporären Tabelle gespeichert werden. Um die OQGRAPH-Tabelle zu erstellen muss zuerst eine temporäre "backing"-Tabelle erstellt werden. Die temporäre "backing"-Tabelle speichert die selektierten Kanten. Hierbei können nur reguläre Tabellen verwendet werden, da OQGRAPH kein VIEW verarbeiten kann. Bei dessen Aufbau werden reguläre SQL-Befehle genutzt. In unserem Fall wird zu Beginn die "backing"-Tabelle für jeden Anwendungsfall erstellt und erst dann unter Nutzung der OQGRAPH-Engine in diesen Tabellen die Traversierung durchgeführt.
+Für die Traversierung werden Funktionen der OQGRAPH-Engine verwendet. Da durch OQGRAPH keine Selektion der Kanten und Knoten über ihre Typen möglich ist, müssen zunächst die selektierten Kanten und Knoten in einer temporären Tabelle gespeichert werden. Um die OQGRAPH-Tabelle zu erstellen muss zuerst eine temporäre Kantentabelle erstellt werden. Diese Tabelle speichert die zu selektierten Kanten (also beispielsweise nur die Businesskontakte). Hierbei können nur reguläre Tabellen verwendet werden, da OQGRAPH kein Views verarbeiten kann. Bei dessen Aufbau werden reguläre SQL-Befehle genutzt. In unserem Fall wird zu Beginn die Kantentabellen für jeden Anwendungsfall erstellt und erst dann unter Nutzung der OQGRAPH-Engine in diesen Tabellen die Traversierung durchgeführt.
 
 Folgende Tests wurden durchgeführt:
 \begin{enumerate}
@@ -162,8 +162,7 @@ Folgende Tests wurden durchgeführt:
 	\ref{fig:LiJou}
 \end{enumerate}
 
-
-Folgende SQL-Selects werden zur Erstellung der temporären "backing"-Tabellen herangezogen.
+Folgende SQL-Selects werden zur Erstellung der temporären Kantentabellen herangezogen.
 \begin{lstlisting}
 -- Vorbereitung Tabelle der Business Kontakten
 SELECT * FROM oq_backing WHERE rtype = "BUSINE";
@@ -235,7 +234,7 @@ SELECT * FROM oq_graph_ausland WHERE latch='breadth_first'
 	\label{fig:LiJouvor}
 \end{figure}
 
-Die Ergebnisse sind wie erwartet: Je größer die Datebanken ist, desto mehr Zeit wird für die Erstellung der Tabellen benötigt. Im Fall der ausländischen Kontakte im Datensatz "LiveJournal" ist der Aufwand wegen der vielen JOIN-Befehle zu groß um die Ergebnisse zu berechnen.
+Die Ergebnisse sind wie erwartet: Je größer die Datenbank ist, desto mehr Zeit wird für die Erstellung der Tabellen benötigt. Im Fall der ausländischen Kontakte im Datensatz \emph{LiveJournal} ist der Aufwand aufgrund vieler JOINS zu groß um die Ergebnisse zu berechnen.
 
 \begin{figure}
 	\centering
@@ -272,7 +271,7 @@ Die Ergebnisse sind wie erwartet: Je größer die Datebanken ist, desto mehr Zei
 	\label{fig:LiJou}
 \end{figure}
 
-Allgemeine kann man feststellen, dass die Bearbeitungszeit für jede transitive Suche von der Rekursionstufe unabhängig ist. Manchmal ist bei der Traversierung die Bearbeitungszeit groß,  wie zum Beispiel beim Diagramm des Datensatzes "Epinions" in der Tiefenstufe 5 zu sehen ist. Mit steigender Rekursionsstufe weichen die Zeitmessungen jedoch nur wenig ab. Daher lässt sich festhalten, dass die Bearbeitungszeit der Traversierung von etwas anderem als der Rekursionsstufe abhängt.
+Allgemeine kann man feststellen, dass die Bearbeitungszeit für jede transitive Suche von der Rekursionsstufe unabhängig ist. Manchmal ist bei der Traversierung die Bearbeitungszeit groß,  wie zum Beispiel beim Diagramm des Datensatzes \emph{Epinions} in der Tiefenstufe 5 zu sehen ist. Mit steigender Rekursionsstufe weichen die Zeitmessungen jedoch nur wenig ab. Daher lässt sich festhalten, dass die Bearbeitungszeit der Traversierung von etwas anderem als der Rekursionsstufe abhängt.
 
 \subsection{Fazit}
-Ebenso wie bei der OLTP Anwendung erfordert der begrenzte Funktionsumfang von OQGRAPH ein Ausweichen auf relationales SQL. Lediglich bei der Traversierung von Knoten kamen Funktionalitäten von OQGRAPH zum Einsatz, allerdings musste auch hier mit Workarounds gearbeitet werden um die Limitierung der homogenen Kanten zu umgehen. Die Performance selbst kann dabei mit konkurrierenden Graphdatenbanken mithalten. Positiv bemerkbar hat sich das koexistierende relationale Datenmodel hingegen bei der Aggregation gemacht, hier kamen die Vorteile von SQL zum Einsatz.
+Ebenso wie bei der OLTP Anwendung erfordert der begrenzte Funktionsumfang von OQGRAPH ein Ausweichen auf relationales SQL. Lediglich bei der Traversierung von Knoten kamen Funktionalitäten von OQGRAPH zum Einsatz, allerdings musste auch hier mit Workarounds gearbeitet werden um die Limitierung der homogenen Kanten zu umgehen. Die Performance selbst kann dabei mit konkurrierenden Graphdatenbanken mithalten. Positiv bemerkbar hingegen hat sich das koexistierende relationale Datenmodel bei der Aggregation gemacht, hier kamen die Vorteile von relationalem SQL zum Einsatz.
