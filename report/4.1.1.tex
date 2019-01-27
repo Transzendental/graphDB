@@ -34,8 +34,6 @@ Es ist daher wichtig den Einfluss von Ausreißern möglichst zu minimieren. Aus 
 
 Die Mess-Vorgänge wurden in SQL-Prozeduren definiert. Diese Prozeduren übernehmen die Zeitmessung, die Speicherung der Messwerte, sowie die Ermittlung des Durchschnittes. Die Messergebnisse werden dabei in einer weiteren Tabelle \emph{analysis} gespeichert, die auf jeder Datenbank erstellt wurde. Die Prozeduren werden dann mittels des \emph{CALL}-SQL-Befehls aufgerufen.
 
-\subsection{Annahmen}
-
 \subsection{Performance-Messung}
 
 \subsubsection{Projektion und Selektion}
@@ -143,8 +141,7 @@ Die Ergebnisse sind wenig überraschend, so steigt mit wachsender Datenmenge auc
 \phantom{Platzhalter wegen verwirrender Figure-Platzierung}
 
 \subsubsection{Traversierung}
-Für die Traversierung wird OQGRAPH-Engine verwendet, aber durch OQGRAPH ist keine Selektion der Knoten und Kanten möglich. Um die OQGRAPH Tabelle zu erstellen, muss man zuerst eine "backing" Tabelle erstellen. Diese "backing" Tabelle speichert die tatsächlichen Daten und wird für alle INSERTS, UPDATES usw. verwendet. Dies sollte eine reguläre Tabelle sein, keine View, und beim Aufbau der "backing" Tabellen werden nur die relationalen Befehlen durchgeführt. 
-In unserem Fall werden am Anfang die "backing" Tabelle für jede Datebanken erstellt, und dann wird schon mit der Benutzung OQGRAPH-Engine in diesen Tabellen die Traversierung durchgeführt werden.
+Für die Traversierung werden Funktionen der OQGRAPH-Engine verwendet. Da durch OQGRAPH keine Selektion der Kanten und Knoten über ihre Typen möglich ist, müssen zunächst die selektierten Kanten und Knoten in einer temporären Tabelle gespeichert werden. Um die OQGRAPH-Tabelle zu erstellen muss zuerst eine temporäre "backing"-Tabelle erstellt werden. Die temporäre "backing"-Tabelle speichert die selektierten Kanten. Hierbei können nur reguläre Tabellen verwendet werden, da OQGRAPH kein VIEW verarbeiten kann. Bei dessen Aufbau werden reguläre SQL-Befehle genutzt. In unserem Fall wird zu Beginn die "backing"-Tabelle für jeden Anwendungsfall erstellt und erst dann unter Nutzung der OQGRAPH-Engine in diesen Tabellen die Traversierung durchgeführt.
 
 Folgende Tests wurden durchgeführt:
 \begin{enumerate}
@@ -166,7 +163,7 @@ Folgende Tests wurden durchgeführt:
 \end{enumerate}
 
 
-Folgende SQL Statements (nur die wichtige SQL Befehlen) wurden durchgeführt:
+Folgende SQL-Selects werden zur Erstellung der temporären "backing"-Tabellen herangezogen.
 \begin{lstlisting}
 -- Vorbereitung Tabelle der Business Kontakten
 SELECT * FROM oq_backing WHERE rtype = "BUSINE";
@@ -238,9 +235,7 @@ SELECT * FROM oq_graph_ausland WHERE latch='breadth_first'
 	\label{fig:LiJouvor}
 \end{figure}
 
-Die Ergebnisse sind ganz erwarten, dass je größer die Datebanken sind, desto mehr die Zeit wird für die Erstellung der Tabellen benötigt und im Fall der QOGRAPH ausländischen Tabellen im LiveJournall ist Aufwand wegen mehreren JOIN Befehelen wirklich zu groß um die Ergebnisse zu berechnen.
-Auch geht es um die kleine Daten im Tabelle "Facebook", darum kann die Tabelle manchmal  für die geschäftlichen Kontakten ein bisschen schneller erstellt werden.  
-
+Die Ergebnisse sind wie erwartet: Je größer die Datebanken ist, desto mehr Zeit wird für die Erstellung der Tabellen benötigt. Im Fall der ausländischen Kontakte im Datensatz "LiveJournal" ist der Aufwand wegen der vielen JOIN-Befehle zu groß um die Ergebnisse zu berechnen.
 
 \begin{figure}
 	\centering
@@ -277,7 +272,7 @@ Auch geht es um die kleine Daten im Tabelle "Facebook", darum kann die Tabelle m
 	\label{fig:LiJou}
 \end{figure}
 
-Allgemeine kann man feststellen, dass die Bearbeitungszeit für jede Transitive Suche vom Tiefstufen unabhängig ist. Manchmal ist bei einigen Suchen die Bearbeitungszeit groß,  z.B als auf dem Diagramm der Epinions im Tiefestufe 5, aber manchmal ist es auch in der Tiefestufe 1 auch, als in Youtube, darum hängt die Bearbeitungszeit von etwas Anderes als Tiefstufen ab. Und trotz vielen Zahlen der Knoten im Livejournal bleibt diese Tendenz fast gleich.
+Allgemeine kann man feststellen, dass die Bearbeitungszeit für jede transitive Suche von der Rekursionstufe unabhängig ist. Manchmal ist bei der Traversierung die Bearbeitungszeit groß,  wie zum Beispiel beim Diagramm des Datensatzes "Epinions" in der Tiefenstufe 5 zu sehen ist. Mit steigender Rekursionsstufe weichen die Zeitmessungen jedoch nur wenig ab. Daher lässt sich festhalten, dass die Bearbeitungszeit der Traversierung von etwas anderem als der Rekursionsstufe abhängt.
 
 \subsection{Fazit}
 Ebenso wie bei der OLTP Anwendung erfordert der begrenzte Funktionsumfang von OQGRAPH ein Ausweichen auf relationales SQL. Lediglich bei der Traversierung von Knoten kamen Funktionalitäten von OQGRAPH zum Einsatz, allerdings musste auch hier mit Workarounds gearbeitet werden um die Limitierung der homogenen Kanten zu umgehen. Die Performance selbst kann dabei mit konkurrierenden Graphdatenbanken mithalten. Positiv bemerkbar hat sich das koexistierende relationale Datenmodel hingegen bei der Aggregation gemacht, hier kamen die Vorteile von SQL zum Einsatz.
